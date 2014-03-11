@@ -19,7 +19,6 @@ sys.path.insert(0, dir_)
 # project library
 from tools.user.interface           import *
 from tools.optimization.interface   import optimize
-
 from scripts.simulation             import simulation
 
 # Set working directory.

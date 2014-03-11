@@ -7,7 +7,6 @@ import cPickle  as pkl
 
 import sys
 import os
-import glob
 
 # testing library
 from nose.core  import runmodule
@@ -23,23 +22,6 @@ from scripts.estimation import estimation
 # Set working directory.
 dir_ = os.path.abspath(os.path.split(sys.argv[0])[0])
 os.chdir(dir_)
-
-def cleanup():
-    ''' Cleanup after test suite.
-    '''
-
-    fileList = []
-    
-    fileList = fileList + glob.glob('*.struct.*')
-    
-    fileList = fileList + glob.glob('*.pkl')
-
-    fileList = fileList + glob.glob('*.pyc')
-     
-    # Remove files.
-    for file_ in fileList:
-            
-        os.remove(file_)
 
 class testCls(object):
     

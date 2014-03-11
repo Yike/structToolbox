@@ -1,15 +1,9 @@
 #!/usr/bin/env python
-# wscript
 
-#/* imports */
-
+# standard library
 import os
 import shutil
-import glob
-import sys
 import fnmatch
-
-#/* directories */
 
 top = '.'
 out = '.bld'
@@ -21,8 +15,6 @@ def options(opt):
     opt.load('compiler_fc')
 
 def configure(conf):
-
-    #/*	set project root	*/
 
     conf.env.project_paths = {}
 
@@ -48,8 +40,6 @@ def build(bld):
 
 def distclean(ctx):
     
-    #/* manual clean    */
-
     remove_filetypes_distclean('.')
 
     remove_for_distclean('.waf-1.6.4-8c7ad4bb8e1ca65b04e5d8dd9d0dac54')
@@ -61,14 +51,12 @@ def distclean(ctx):
     remove_for_distclean('tools/computation/f90/lib')
 
     
-''' Auxillary functions.
-
+''' Auxiliary functions.
 '''
 def remove_for_distclean(path):
     ''' Remove path, where path can be either a directory or a file. The
         appropriate function is selected. Note, however, that if an 
         OSError occurs, the function will just path.
-
     '''
 
     if os.path.isdir(path):
@@ -86,7 +74,7 @@ def remove_filetypes_distclean(path):
 
     matches = []
 
-    for root, dirnames, filenames in os.walk('.'):
+    for root, _, filenames in os.walk('.'):
 
         for filetypes in ['*.aux','*.log','*.pyc', '*.so', '*~', '*tar', \
             '*.zip', '.waf*', '*lock*', '*.mod', '*.a', '*.pkl', '*.out', '*.pyo', '*.info']:

@@ -2,8 +2,8 @@
 ''' Test cases
 '''
 # standard library
-import numpy    as np
-import scipy
+import numpy as np
+import scipy.stats
 
 import sys
 import os
@@ -17,12 +17,7 @@ dir_ = os.path.dirname(os.path.realpath(__file__)).replace('/tests', '')
 sys.path.insert(0, dir_)
 
 # project library
-from tools.user.interface           import *
-from tools.optimization.interface   import optimize
-
-from scripts.simulation             import simulation
-
-import tools.computation.f90.f90_main     as fort
+import tools.computation.f90.f90_main as fort
 
 # Set working directory.
 dir_ = os.path.abspath(os.path.split(sys.argv[0])[0])

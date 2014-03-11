@@ -17,9 +17,6 @@ dir_ = os.path.dirname(os.path.realpath(__file__)).replace('/tests', '')
 sys.path.insert(0, dir_)
 
 # project library
-from tools.user.interface           import *
-from tools.optimization.interface   import optimize
-
 from scripts.simulation             import simulation
 from scripts.estimation             import estimation
 

@@ -110,17 +110,3 @@ def f2py_call(self):
 
     cmd = 'f2py -c -m  f90_main  f90_main.f90 -Iinclude -Llib -lstruct'
     os.system(cmd)
-
-#------------------------------------------------------------------------------
-#   development comments
-#------------------------------------------------------------------------------
-#
-#   I need to make sure the dependencies for the f2py are complete and used in the
-#   build process.   
-#   
-#   Separation of f2py call in a function is required so I can assure sequential
-#   execution.
-#
-#   Should call f2py from inside python.
-#
-
