@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+# wscript
+
+#/* imports */
+
+import os
+
+#------------------------------------------------------------------------------
+#   waf build
+#------------------------------------------------------------------------------
+
+def build(bld):
+
+    os.chdir(bld.env.project_paths['STRUCT_ESTIMATOR'] + '/tests')
+
+    bld(features = 'run_py_script', source = 'testA.py', target = "",  version = 2)
+
+    bld(features = 'run_py_script', source = 'testB.py', target = "",  version = 2)
+    
+    bld(features = 'run_py_script', source = 'testC.py', target = "",  version = 2)
+    
+    bld(features = 'run_py_script', source = 'testD.py', target = "",  version = 2)
+
+    bld(features = 'run_py_script', source = 'testE.py', target = "",  version = 2)
