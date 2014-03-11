@@ -65,7 +65,7 @@ def pre_build(self):
 
     '''
 
-    absolute_path = os.path.join(self.env.project_paths['MAIN'], self.env.project_paths['STRUCT_ESTIMATOR'])
+    absolute_path = os.path.join(self.env.project_paths['MAIN'], self.env.project_paths['STRUCT_TOOLBOX'])
     
     os.chdir(absolute_path + '/tools/computation/f90')
 
@@ -83,7 +83,7 @@ def post_build(self):
 
     '''
 
-    working_ext =  self.env.project_paths['STRUCT_ESTIMATOR']
+    working_ext =  self.env.project_paths['STRUCT_TOOLBOX']
 
     project_root = self.env.project_paths['MAIN']
 

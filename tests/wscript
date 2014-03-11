@@ -11,7 +11,7 @@ import os
 
 def build(bld):
 
-    os.chdir(bld.env.project_paths['STRUCT_ESTIMATOR'] + '/tests')
+    os.chdir(bld.env.project_paths['STRUCT_TOOLBOX'] + '/tests')
 
     bld(features = 'run_py_script', source = 'testA.py', target = "",  version = 2)
 

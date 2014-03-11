@@ -28,9 +28,9 @@ def configure(conf):
 
     conf.env.project_paths['MAIN'] = os.getcwd()
     
-    conf.env.project_paths['STRUCT_ESTIMATOR'] = '.'
+    conf.env.project_paths['structToolbox'] = '.'
 
-    tools_dir = conf.env.project_paths['STRUCT_ESTIMATOR'] + '/tools/computation/msc'
+    tools_dir = conf.env.project_paths['structToolbox'] + '/tools/computation/msc'
 
     conf.load('runPyScript', tooldir = tools_dir)
     
@@ -89,15 +89,13 @@ def remove_filetypes_distclean(path):
     for root, dirnames, filenames in os.walk('.'):
 
         for filetypes in ['*.aux','*.log','*.pyc', '*.so', '*~', '*tar', \
-            '*.zip', '.waf*', '*lock*', '*.mod', '*.a', '*.pkl', '*.out', '*.pyo']:
+            '*.zip', '.waf*', '*lock*', '*.mod', '*.a', '*.pkl', '*.out', '*.pyo', '*.info']:
 
                 for filename in fnmatch.filter(filenames, filetypes):
                     
                     matches.append(os.path.join(root, filename))
 
     matches.append('.lock-wafbuild')
-
-    matches.append('opt_mechanisms/.bld')
     
     matches.append('doc/.build')
 
