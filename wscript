@@ -28,9 +28,9 @@ def configure(conf):
 
     conf.env.project_paths['MAIN'] = os.getcwd()
     
-    conf.env.project_paths['structToolbox'] = '.'
+    conf.env.project_paths['STRUCT_TOOLBOX'] = '.'
 
-    tools_dir = conf.env.project_paths['structToolbox'] + '/tools/computation/msc'
+    tools_dir = conf.env.project_paths['STRUCT_TOOLBOX'] + '/tools/computation/msc'
 
     conf.load('runPyScript', tooldir = tools_dir)
     
