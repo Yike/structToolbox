@@ -133,6 +133,11 @@ class agentCls(meta):
         # Antibugging.
         assert (self.getStatus() == True)
         
+        self._evaluateNodes()
+
+    def _evaluateNodes(self):
+        ''' Evaluate nodes for current parametrization.
+        '''
         # Distribute class attributes.
         treeObj  = self.attr['treeObj']
 
@@ -155,7 +160,7 @@ class agentCls(meta):
                 self._calculateEmax(node)
                 
                 self._calculateV(node)
-
+                
     def _calculateU(self, node):
         ''' Calculate the instantaneous utility.
         '''
