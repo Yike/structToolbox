@@ -53,8 +53,6 @@ def _speedyCalculation(obsEconomy, parasObj):
     wages     = obsEconomy.getAttr('wages') 
 
     choices   = obsEconomy.getAttr('choices')
-    
-    numAgents = obsEconomy.getAttr('numAgents')
 
     # Experience 
     coeffs        = parasObj.getParameters('experience')
@@ -98,12 +96,7 @@ def _speedyCalculation(obsEconomy, parasObj):
     home = scipy.stats.norm.cdf(-xiStar, xi['mean'], xi['sd'])
         
     # Working.
-    rho = parasObj.getParameters('rho')
-                        
-    eps  = parasObj.getParameters('eps')
-                            
     eta  = parasObj.getParameters('eta')
-
                         
     # Working (unconditional)  
     real = wages - idxWage
