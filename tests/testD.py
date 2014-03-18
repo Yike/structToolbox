@@ -16,8 +16,8 @@ from nose.tools import *
 dir_ = os.path.dirname(os.path.realpath(__file__)).replace('/tests', '')
 sys.path.insert(0, dir_)
 
-from scripts.simulation import simulation
-from scripts.estimation import estimation
+from scripts.simulate import simulate
+from scripts.estimate import estimate
 
 # Set working directory.
 dir_ = os.path.abspath(os.path.split(sys.argv[0])[0])
@@ -27,9 +27,9 @@ class testCls(object):
     
     def test_case_1(self):
                 
-        simulation(initFile = '../dat/testD.ini', dataFile = 'testD.pkl')
+        simulate(initFile = '../dat/testD.ini', dataFile = 'testD.pkl')
         
-        estimation(initFile = '../dat/testD.ini', dataFile = 'testD.pkl')
+        estimate(initFile = '../dat/testD.ini', dataFile = 'testD.pkl')
         
         rslt = pkl.load(open('rslt.struct.pkl', 'r'))
        

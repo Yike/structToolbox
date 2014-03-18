@@ -62,7 +62,7 @@ class paraCls(meta):
         self.attr['value'] = copy.deepcopy(startVal)
         
         # Process restrictions.
-        type_, info  = self.attr['rest']
+        type_, info = self.attr['rest']
 
         self.attr['update'], self.attr['bounds'] = True, info
                 

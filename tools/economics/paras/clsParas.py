@@ -52,7 +52,7 @@ class parasCls(meta):
         # Automatic restrictions
         if(subtype in ['subsidy', 'cost']):
             
-            rest = ['fixed', value]    
+            rest = ['fixed', (None, None)]   
                 
         if(subtype in ['eps', 'eta']):
 
@@ -63,7 +63,7 @@ class parasCls(meta):
             rest = ['range', (-1.0, 1.0)] 
         
         # Fixed parameters.
-        if(not isFree): rest = ['fixed', value]           
+        if(not isFree): rest = ['fixed', (None, None)]           
                 
         if(rest[0] != 'fixed'):
             
@@ -187,8 +187,7 @@ class parasCls(meta):
         assert (paraObj.attr['rest'][0] in ['free', 'range'])     
                 
         # Auxiliary objects.
-        lowerBound = paraObj.attr['bounds'][0]
-        upperBound = paraObj.attr['bounds'][1]
+        lowerBound, upperBound = paraObj.attr['bounds']
         
         hasLowerBound = (lowerBound is not None)
         hasUpperBound = (upperBound is not None)
@@ -224,8 +223,7 @@ class parasCls(meta):
         assert (paraObj.attr['rest'][0] in ['free', 'range'])        
         
         # Auxiliary objects.
-        lowerBound = paraObj.attr['bounds'][0]
-        upperBound = paraObj.attr['bounds'][1]
+        lowerBound, upperBound = paraObj.attr['bounds']
         
         hasLowerBound = (lowerBound is not None)
         hasUpperBound = (upperBound is not None)
@@ -274,8 +272,7 @@ class parasCls(meta):
         assert (paraObj.attr['rest'][0] in ['free', 'range'])
         
         # Auxiliary objects.
-        lowerBound = paraObj.attr['bounds'][0]
-        upperBound = paraObj.attr['bounds'][1]
+        lowerBound, upperBound = paraObj.attr['bounds']
         
         hasLowerBound = (lowerBound is not None)
         hasUpperBound = (upperBound is not None)
@@ -339,8 +336,7 @@ class parasCls(meta):
 
         # Initialize container.        
         dict_ = {}
-        
-
+    
 
         dict_['child']      = None
         
@@ -384,12 +380,8 @@ class parasCls(meta):
     def _derivedParameters(self, dict_):
         ''' Construct dictionary with derived parameters.
         '''
-        paraObjs = self.attr['paraObjs']
-        
         # Select ingredients.
         cov = dict_['shocks']
-            
-          
             
         # Construct output.
         eps = {}
@@ -401,7 +393,6 @@ class parasCls(meta):
         # Finished.
         dict_['eps'] =  eps
 
-           
         # Select ingredients.
         cov = dict_['shocks']
             
@@ -412,11 +403,10 @@ class parasCls(meta):
                 
         eta['mean'] = 0.00
 
-            # Finished.            
+        # Finished.            
         dict_['eta'] = eta
   
   
-            
         cov = dict_['shocks']
             
         eps = dict_['eps']
@@ -458,7 +448,6 @@ class parasCls(meta):
         
         
         dict_['xi'] = xi
-
 
         # Finished.
         return dict_

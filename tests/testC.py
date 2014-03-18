@@ -19,7 +19,7 @@ sys.path.insert(0, dir_)
 # project library
 from tools.user.interface           import *
 from tools.optimization.interface   import optimize
-from scripts.simulation             import simulation
+from scripts.simulate               import simulate
 
 # Set working directory.
 dir_ = os.path.abspath(os.path.split(sys.argv[0])[0])
@@ -29,7 +29,7 @@ class testCls(object):
     
     def test_case_1(self):
         
-        simulation(initFile = '../dat/testC.ini', dataFile = 'testC.pkl')
+        simulate(initFile = '../dat/testC.ini', dataFile = 'testC.pkl')
         
         ''' Process initialization file.
         '''

@@ -3,6 +3,7 @@
 '''
 # standard library
 import cPickle as pkl
+import numpy   as np
 
 import argparse
 import sys
@@ -19,15 +20,17 @@ from tools.optimization.interface   import optimize
 
 ''' Process initialization file.
 '''
-def estimation(initFile = 'init.ini', dataFile = 'obsEconomy.pkl'):
+def estimate(initFile = 'init.ini', update = False, dataFile = 'obsEconomy.pkl'):
     ''' Run estimation. 
     '''
     # Antibugging.
     assert (isinstance(initFile, str))
-    assert (isinstance(dataFile, str))    
+    assert (isinstance(dataFile, str))
     
     assert (os.path.exists(initFile))
     assert (os.path.exists(dataFile))
+    
+    assert (update in [True, False])
         
     ''' Process initialization file.
     '''
@@ -50,10 +53,18 @@ def estimation(initFile = 'init.ini', dataFile = 'obsEconomy.pkl'):
     
     parasObj     = initDict['PARAS']
 
-    derived     = initDict['DERIV']
+    derived      = initDict['DERIV']
 
-    
+    ''' Update.
+    '''
+    if(update):
         
+        values = np.genfromtxt(open('stepParas.struct.out', 'r'))
+        
+        parasObj.update(values, 'internal', 'all')
+    
+    ''' Construct request.
+    ''' 
     requestObj = requestCls()
     
     requestObj.setAttr('parasObj', parasObj)
@@ -83,13 +94,35 @@ def _distributeInput(parser):
     # Distribute arguments.
     initFile = args.init 
     
+    update   = args.update
+    
+    dataFile = args.dataFile
+    
     # Assertions.
-    assert (initFile is not None)
-    assert (os.path.exists(initFile))
+    for file_ in [initFile, dataFile]:
+
+        assert (file_ is not None)
+        assert (os.path.exists(file_))
+    
+    assert (update in [False, True])
+    
+    if(update): assert (os.path.exists('stepParas.struct.out'))
     
     # Finishing.
-    return initFile
+    return initFile, update, dataFile
 
+def fork():
+    ''' Fork child process to run estimation in the background.
+    '''
+        
+    pid = os.fork()
+
+    if(pid > 0): sys.exit(0)
+
+    pid = os.getpid()
+    
+    np.savetxt('.pid', [pid], fmt ='%d')
+    
 ''' Execution of module as script.
 '''
 if __name__ == '__main__':
@@ -97,12 +130,26 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 
       'Estimation run of the structToolbox.')
 
+    parser.add_argument('-dataFile', \
+                        action  = 'store', \
+                        dest    = 'dataFile', \
+                        default = 'obsEconomy.pkl', \
+                        help    = 'Name of dataset.')
+    
     parser.add_argument('-init', \
                         action  = 'store', \
                         dest    = 'init', \
                         default = 'init.ini', \
                         help    = 'Configuration for estimation.')
     
-    initFile = _distributeInput(parser)
+    parser.add_argument('-update', \
+                        action  = 'store_true', \
+                        dest    = 'update', \
+                        default = False, \
+                        help    = 'Update parameter class.')
+    
+    fork() 
+     
+    initFile, update, dataFile = _distributeInput(parser)
         
-    estimation(initFile = initFile)
+    estimate(initFile = initFile, update = update, dataFile = dataFile)
