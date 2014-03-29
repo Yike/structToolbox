@@ -20,7 +20,12 @@ def options(opt):
                     dest    = 'speed', \
                     default = False, \
                     help    = 'Compile Fortran library for faster estimation.')
-        
+
+    opt.add_option('--test', \
+                    action  = 'store_true', \
+                    dest    = 'test', \
+                    default = False, \
+                    help    = 'Execute unit testing library.')        
 def configure(conf):
     
     # Distribute options.
@@ -47,6 +52,8 @@ def build(bld):
     # Distribute options.
     speed = bld.options.speed
     
+    test  = bld.options.test
+        
     bld.env.PROJECT_PATHS = set_project_paths(bld)
 
     os.chdir(bld.env.project_paths['STRUCT_TOOLBOX'])
@@ -56,10 +63,8 @@ def build(bld):
     if(speed):
         
         bld.recurse('tools/computation/f90')
-    
-    nose = get_nose()
-    
-    if(nose):
+        
+    if(test):
 
         bld.add_group() 
     
@@ -79,22 +84,6 @@ def distclean(ctx):
     
 ''' Auxiliary functions.
 '''
-def get_nose():
-    ''' Check for nose unit-testing framework.
-    '''
-    nose = True
-    
-    try:
-        
-        import nose
-    
-    except ImportError:
-        
-        nose = False
-        
-    # Finishing.
-    return nose
-    
 def set_permissions():
     ''' Set permissions.
     '''
