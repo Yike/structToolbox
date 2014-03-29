@@ -2,6 +2,8 @@
 
 # standard library
 import os
+import glob
+import stat
 import shutil
 import fnmatch
 
@@ -20,7 +22,7 @@ def configure(conf):
 
     conf.env.project_paths['MAIN'] = os.getcwd()
     
-    conf.env.project_paths['STRUCT_TOOLBOX'] = '.'
+    conf.env.project_paths['STRUCT_TOOLBOX'] = os.getcwd()
 
     tools_dir = conf.env.project_paths['STRUCT_TOOLBOX'] + '/tools/computation/msc'
 
@@ -31,6 +33,10 @@ def configure(conf):
 def build(bld):
     
     bld.env.PROJECT_PATHS = set_project_paths(bld)
+
+    os.chdir(bld.env.project_paths['STRUCT_TOOLBOX'])
+
+    set_permissions()
 
     bld.recurse('tools/computation/f90')
 
@@ -49,10 +55,19 @@ def distclean(ctx):
     remove_for_distclean('tools/computation/f90/include')
 
     remove_for_distclean('tools/computation/f90/lib')
-
     
 ''' Auxiliary functions.
 '''
+def set_permissions():
+    ''' Set permissions.
+    '''
+    
+    files = glob.glob('scripts/*.py')
+
+    for file_ in files:
+        
+        os.chmod(file_, 0777)
+    
 def remove_for_distclean(path):
     ''' Remove path, where path can be either a directory or a file. The
         appropriate function is selected. Note, however, that if an 
@@ -95,7 +110,6 @@ def set_project_paths(ctx):
     ''' Return a dictionary with project paths represented by Waf nodes. This is
         required such that the run_py_script works as the whole PROJECT_ROOT is
         added to the Python path during execution.
-
     ''' 
 
     pp = {}

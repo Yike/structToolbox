@@ -17,9 +17,6 @@ from tools.user.interface        import *
 
 from tools.economics.interface   import *
 
-from tools.optimization.criterions.mle.calculations import sampleLikelihood
-
-
 def simulate(initFile = 'init.ini', dataFile = 'obsEconomy.pkl', update = False):
     ''' Simulation of agent population.
     '''
@@ -148,17 +145,14 @@ def simulate(initFile = 'init.ini', dataFile = 'obsEconomy.pkl', update = False)
     for _ in range(numPeriods):
         
         economyObj.simulate()
-
-    ''' Evaluate likelihood.
-    '''
-    likl = sampleLikelihood(economyObj, parasObj, False, None)
-
+    
     ''' Store.
     '''
     economyObj.store(dataFile)
     
-    _writeInfo(economyObj, parasObj, likl, dataFile)
-     
+    _writeInfo(economyObj, parasObj)
+
+        
 ''' Auxiliary functions.
 '''
 def _distributeInput(parser):
@@ -171,47 +165,36 @@ def _distributeInput(parser):
     initFile = args.init 
     
     update   = args.update
-
-    dataFile = args.dataFile
     
     # Assertions.
-    for file_ in [initFile]:
-
-        assert (file_ is not None)
-        
-    assert (isinstance(dataFile, str))
+    assert (initFile is not None)
+    assert (os.path.exists(initFile))
     assert (update in [False, True])
     
     # Finishing.
-    return initFile, update, dataFile
+    return initFile, update
 
-def _writeInfo(obsEconomy, parasObj,  likl, dataFile):
+def _writeInfo(obsEconomy, parasObj):
     ''' Write some info about the simulated economy to a text file.
     '''
-    # Auxiliary objects.
-    fileName = dataFile.replace('.pkl', '')
     
     # Write parameters.
     x = parasObj.getValues('internal', 'all')
 
-    np.savetxt(fileName + '.paras.struct.out', x, fmt = '%15.10f')
+    np.savetxt('simParas.struct.out', x, fmt = '%15.10f')
     
     # Document choices.
     numPeriods = str(obsEconomy.getAttr('numPeriods'))
     
     numAgents  = str(obsEconomy.getAttr('numAgents'))
     
-    likl       = str(likl)
-    
-    with open(fileName + '.infos.struct.out', 'w') as file_:
+    with open('simEconomy.struct.info', 'w') as file_:
         
         file_.write('\n Simulated Economy\n\n')
         
         file_.write('   Number of Observations: ' + numAgents + '\n\n')
 
-        file_.write('   Number of Periods:      ' + numPeriods + '\n\n')  
-
-        file_.write('   Likelihood:             ' + likl       + '\n\n\n')  
+        file_.write('   Number of Periods:      ' + numPeriods + '\n\n\n')  
     
         file_.write('   Choices:  \n\n') 
 
@@ -241,13 +224,7 @@ if __name__ == '__main__':
                         dest    = 'init', \
                         default = 'init.ini', \
                         help    = 'Configuration for simulation.')
-
-    parser.add_argument('-dataFile', \
-                        action  = 'store', \
-                        dest    = 'dataFile', \
-                        default = 'obsEconomy.pkl', \
-                        help    = 'Name of dataset.')
-
+    
     parser.add_argument('-update', \
                         action  = 'store_true', \
                         dest    = 'update', \
@@ -255,6 +232,6 @@ if __name__ == '__main__':
                         help    = 'Update parameter class.')
 
 
-    initFile, update, dataFile = _distributeInput(parser)
+    initFile, update = _distributeInput(parser)
     
-    simulate(initFile = initFile, update = update, dataFile = dataFile)
+    simulate(initFile = initFile, update = update)

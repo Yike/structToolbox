@@ -44,6 +44,20 @@ def _basics(initDict):
             
     assert (sum(isFree) > 0)
     
+    ''' Parallelism.
+    '''
+    mpi4py = True
+    
+    try:
+        
+        import mpi4py
+    
+    except ImportError:
+        
+        mpi4py = False
+        
+    if(not mpi4py): assert (initDict['EST']['processors'] ==  1) 
+
 def _identification(initDict):
     ''' Check for identification.
     '''   

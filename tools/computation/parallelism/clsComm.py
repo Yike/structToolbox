@@ -5,8 +5,15 @@
 import sys
 import os
 
-from mpi4py     import MPI
 import numpy as np
+
+try:
+    
+    from mpi4py     import MPI
+
+except ImportError:
+    
+    pass
 
 # project library
 from tools.clsMeta import meta

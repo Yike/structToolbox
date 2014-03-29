@@ -1,21 +1,15 @@
 #!/usr/bin/env python
-# wscript
 
-#/* imports */
-
-import os
+# standard library
 import fnmatch
 import shutil
-
-#------------------------------------------------------------------------------
-#   waf build
-#------------------------------------------------------------------------------
+import os
 
 def build(bld):
 
     bld(rule = pre_build)
 
-    compiler_options    = '-fbounds-check -Wunused -fPIC'
+    compiler_options = '-fbounds-check -Wunused -fPIC'
 
     files = ['f90_struct_lib_modProgramConstants.f90',
              'f90_struct_lib_modPerformanceEnhancements.f90', 
@@ -27,10 +21,9 @@ def build(bld):
 
         bld.add_group()
 
-        bld(
-                features  = 'fc',
-    			source    = file_,
-         fcflags   = compiler_options
+        bld(features  = 'fc',
+    		source    = file_,
+            fcflags   = compiler_options
         )
 
     bld.add_group()
@@ -39,51 +32,51 @@ def build(bld):
 		 	features  = 'fc fcstlib',
 	  		source    = files,
 	  		target    ='struct',
-fcflags   = compiler_options
-            
+            fcflags   = compiler_options
     )
 
     bld.add_group()
 
     bld(rule = post_build)
 
-
-    #/* fortran interface */
-
     bld.add_group()
 
     bld(rule = f2py_call)
 
-#    bld.add_group()
-
-#------------------------------------------------------------------------------
-#   auxillary functions
-#------------------------------------------------------------------------------
+''' Auxiliary functions.
+'''
 def pre_build(self):
-    ''' Create the include and lib directory to store the library and compiled
-        files if not yet present.
-
+    ''' Create the include and library directory to store the library and 
+        compiled files if not yet present.
     '''
 
-    absolute_path = os.path.join(self.env.project_paths['MAIN'], self.env.project_paths['STRUCT_TOOLBOX'])
+    path = self.env.project_paths['STRUCT_TOOLBOX']
     
-    os.chdir(absolute_path + '/tools/computation/f90')
+    os.chdir(path + '/tools/computation/f90')
 
     for dir_ in ['include', 'lib']:
         
         try:
             
             os.makedirs(dir_)
+        
         except OSError:
             
             pass
+        
 def post_build(self):
     ''' Copy the resulting library from the build directory to the working 
         directory. 
 
     '''
+    
+    working_ext = ''
 
-    working_ext =  self.env.project_paths['STRUCT_TOOLBOX']
+    if(self.env.project_paths['STRUCT_TOOLBOX'] != self.env.project_paths['MAIN']):
+        
+        working_ext = 'structToolbox'
+    
+    self.env.project_paths['STRUCT_TOOLBOX']
 
     project_root = self.env.project_paths['MAIN']
 
@@ -105,8 +98,6 @@ def post_build(self):
 
 def f2py_call(self):
     ''' Create the interface to f90_main using f2py.
-
     '''
 
-    cmd = 'f2py -c -m  f90_main  f90_main.f90 -Iinclude -Llib -lstruct'
-    os.system(cmd)
+    os.system('f2py -c -m  f90_main  f90_main.f90 -Iinclude -Llib -lstruct')

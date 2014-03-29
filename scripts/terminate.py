@@ -4,19 +4,29 @@
 
 # standard library.
 import subprocess
+import argparse
 import os
 
 import numpy as np
 
-''' Terminate process and clean up.
+''' Execution of module as script.
 '''
-try:
-    pid = np.genfromtxt('.pid', dtype ='int')    
+if __name__ == '__main__':
     
-    os.unlink('.pid')
-    
-    subprocess.call(['kill', str(pid)])
-    
-except :
-    
-    pass
+    parser = argparse.ArgumentParser(description = 
+      'Terminate estimation run.')
+
+    args = parser.parse_args()
+ 
+    try:
+        
+        pid = np.genfromtxt('.pid', dtype ='int')    
+        
+        os.unlink('.pid')
+        
+        subprocess.call(['kill', str(pid)])
+        
+    except :
+        
+        pass
+
