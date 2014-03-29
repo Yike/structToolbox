@@ -56,10 +56,6 @@ class initCls(meta):
                 if(keyword ==  'SPOUSE'):
                         
                     initDict = self._processSPOUSE(initDict, currentLine) 
-                                        
-                if(keyword ==  'CHILDREN'):
-                        
-                    initDict = self._processCHILD(initDict, currentLine)        
         
                 if(keyword ==  'BASICS'):
                         
@@ -136,7 +132,7 @@ class initCls(meta):
 
         pos = pos + initDict['UTILITY']['coeffs']['pos']
         
-        pos = pos + initDict['CHILD']['coeffs']['pos']
+        pos = pos + initDict['UTILITY']['child']['pos']
     
         pos = pos + initDict['WAGE']['coeffs']['pos']
         
@@ -230,37 +226,21 @@ class initCls(meta):
             initDict['UTILITY']['int']['value'] += [value] 
 
             initDict['UTILITY']['int']['free']  += [isFree] 
+
+        if(keyword in ['child']):
             
+            pos   = int(currentLine[1])
+            
+            value, isFree = aux._processLine(currentLine[2])
+            
+            initDict['UTILITY']['child']['pos']   += [pos] 
+ 
+            initDict['UTILITY']['child']['value'] += [value] 
+
+            initDict['UTILITY']['child']['free']  += [isFree]             
         # Finishing.
         return initDict
     
-    def _processCHILD(self, initDict, currentLine):
-        ''' Process optimization details.
-        '''
-        # Antibugging.
-        assert (isinstance(initDict, dict))
-        assert (isinstance(currentLine, list))
-        
-        # Process information.    
-        keyword = currentLine[0]
-        flag    = currentLine[1]
-
-        # Construct dictionary.          
-        if(keyword in ['coeff']):
-            
-            pos = int(flag)
-            
-            value, isFree = aux._processLine(currentLine[2])
-                        
-            initDict['CHILD']['coeffs']['pos']   = [pos]
-
-            initDict['CHILD']['coeffs']['value'] = [value]
-
-            initDict['CHILD']['coeffs']['free']  = [isFree]
-            
-        # Finishing.
-        return initDict
-
     def _processSHOCKS(self, initDict, currentLine):
         ''' Process optimization details.
         '''
@@ -452,8 +432,6 @@ class initCls(meta):
         initDict['UTILITY']     = {}
         
         initDict['BASICS']      = {}
-                
-        initDict['CHILD']       = {}
 
         initDict['SPOUSE']      = {}
 
@@ -468,26 +446,18 @@ class initCls(meta):
         initDict['EST']         = {}   
 
         initDict['SIM']         = {}   
-        
-        
 
-        initDict['CHILD']['coeffs'] = {}
 
-        initDict['CHILD']['coeffs']['value'] = []
-        
-        initDict['CHILD']['coeffs']['pos']   = []
-
-        initDict['CHILD']['coeffs']['free']  = []
-
-        
-        initDict['UTILITY']['coeffs'] = {}
-
-        initDict['UTILITY']['coeffs']['value'] = []
-        
-        initDict['UTILITY']['coeffs']['pos']   = []
-
-        initDict['UTILITY']['coeffs']['free']  = []
-        
+        for keyword in ['coeffs', 'child']:
+                     
+            initDict['UTILITY'][keyword] = {}
+    
+            initDict['UTILITY'][keyword]['value'] = []
+            
+            initDict['UTILITY'][keyword]['pos']   = []
+    
+            initDict['UTILITY'][keyword]['free']  = []
+            
         
         initDict['UTILITY']['int'] = {}
         

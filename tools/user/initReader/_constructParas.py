@@ -18,14 +18,6 @@ def _constructParas(initDict):
     
         parasObj.addParameter('BASICS', key_, value)
         
-    ''' CHILDREN
-    '''    
-    value  = initDict['CHILD']['coeffs']['value'][0]
-    
-    isFree = initDict['CHILD']['coeffs']['free'][0] 
-    
-    parasObj.addParameter('CHILD', None, value, isFree)
-    
     ''' UTILITY
     '''
     for subtype in ['coeffs', 'int']:
@@ -41,6 +33,13 @@ def _constructParas(initDict):
             parasObj.addParameter('UTILITY', subtype, value, isFree[count])
             
             count = count + 1
+    
+    # Special treatment of children.
+    value  = initDict['UTILITY']['child']['value'][0]
+    
+    isFree = initDict['UTILITY']['child']['free'][0] 
+    
+    parasObj.addParameter('CHILD', None, value, isFree)
     
     ''' WAGE
     '''

@@ -27,7 +27,9 @@ def _basics(initDict):
     ''' Experience present.
     '''
     assert (len(initDict['WAGE']['exper']['pos']) > 0)
-    
+
+    assert (len(initDict['UTILITY']['child']['pos']) > 0)
+        
     ''' There is at least one free parameter.
     '''
     isFree = []
@@ -36,12 +38,16 @@ def _basics(initDict):
     
         isFree = isFree + [initDict['SHOCKS'][shock]['free']]
     
-    for type_ in ['CHILD', 'UTILITY', 'WAGE']:
+    for type_ in ['UTILITY', 'WAGE']:
     
         subtypes = ['coeffs', 'int']
+
+
+        if(type_ == 'UTILITY'): subtypes = subtypes + ['child']
+
+        if(type_ == 'WAGE'):    subtypes = subtypes + ['exper']
         
-        if(type_ == 'CHILD'): subtypes = ['coeffs']
-    
+        
         for subtype in subtypes:
             
             isFree = isFree + initDict[type_][subtype]['free']

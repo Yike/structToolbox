@@ -79,7 +79,7 @@ def simulate(initFile = 'init.ini', dataFile = 'obsEconomy.pkl', update = False)
             values[i] = np.random.rand()
         
         # Special treatments.
-        pos = initDict['CHILD']['coeffs']['pos']
+        pos = initDict['UTILITY']['child']['pos']
         
         values[pos[0]] = np.random.randint(low = 0, high = 10)
                 
@@ -92,7 +92,7 @@ def simulate(initFile = 'init.ini', dataFile = 'obsEconomy.pkl', update = False)
         attr['experience'] = [0.0]
                     
         # Children.
-        pos = initDict['CHILD']['coeffs']['pos']
+        pos = initDict['UTILITY']['child']['pos']
     
         attr['children'] = values[pos[0]]
         
