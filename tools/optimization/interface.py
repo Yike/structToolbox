@@ -8,7 +8,7 @@ from tools.optimization.algorithms.clsAlgorithms    import algoCls
 
 from tools.optimization.clsOptRequest               import optRequestCls
 
-from tools.computation.performance.repClsAgents     import replacements
+from tools.computation.performance.replacements     import replacements
 
 from tools.computation.parallelism.clsComm          import commCls
 
@@ -28,28 +28,20 @@ def optimize(requestObj):
     obsEconomy   = requestObj.getAttr('obsEconomy')        
 
     derived      = requestObj.getAttr('derived')             
-                
+    
     # Further information.
-    isRestart = estimation['restart']
+    accelerated = estimation['accelerated']
     
-    numProcs  = estimation['processors']
+    isRestart   = estimation['restart']
+    
+    numProcs    = estimation['processors']
 
-    static    = derived['static']
+    static      = derived['static']
     
-        
     ''' Performance
     '''
-    agentObjs = obsEconomy.getAttr('agentObjs')
-    
-    agentObjs = replacements(agentObjs)
-
-    obsEconomy.unlock()
-    
-    obsEconomy.setAttr('agentObjs', agentObjs)
-    
-    obsEconomy.lock()
-    
-    
+    if(accelerated): replacements()
+        
     ''' Parallelism
     '''
     commObj = None

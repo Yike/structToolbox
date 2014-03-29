@@ -76,7 +76,7 @@ def estimate(initFile = 'init.ini', update = False, dataFile = 'obsEconomy.pkl')
     requestObj.setAttr('derived', derived)
     
     requestObj.setAttr('optimization', optimization)
-    
+
     requestObj.lock()
     
     ''' Call optimization.
@@ -130,19 +130,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 
       'Estimation run of the structToolbox.')
 
-    parser.add_argument('-dataFile', \
+    parser.add_argument('--dataFile', \
                         action  = 'store', \
                         dest    = 'dataFile', \
                         default = 'obsEconomy.pkl', \
                         help    = 'Name of dataset.')
     
-    parser.add_argument('-init', \
+    parser.add_argument('--init', \
                         action  = 'store', \
                         dest    = 'init', \
                         default = 'init.ini', \
                         help    = 'Configuration for estimation.')
     
-    parser.add_argument('-update', \
+    parser.add_argument('--update', \
                         action  = 'store_true', \
                         dest    = 'update', \
                         default = False, \

@@ -285,7 +285,7 @@ class parasCls(meta):
         
         if(hasBounds):
             
-            externalValue = np.clip(externalValue, None, 10)
+            externalValue = np.clip(externalValue, -np.inf, 10)
         
         # Lower bound only.
         if((hasLowerBound) and (not hasUpperBound)):

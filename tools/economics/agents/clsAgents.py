@@ -1,12 +1,12 @@
 ''' Module that contains the agents class.
 '''
 # standard library
+import scipy.stats
 import numpy as np
 
 # project library
 from tools.clsMeta  import meta
 
-import _auxiliary as aux
 
 class agentCls(meta):
     ''' Class instance that represents the agent.
@@ -69,15 +69,6 @@ class agentCls(meta):
 
         self.attr['position'] = '0'
 
-        # External functions.
-        self.wrapper_norm_cdf    = aux.wrapper_norm_cdf 
-
-        self.wrapper_norm_pdf    = aux.wrapper_norm_pdf
-        
-        self.wrapper_dot_product = aux.wrapper_dot_product
-
-        self.wrapper_clip_value  = aux.wrapper_clip_value
-                
         # Status indicator.
         self.isLocked = False
         
@@ -193,7 +184,7 @@ class agentCls(meta):
             
             coeffs, int_ = parasObj.getParameters('wage')
             
-            idxWage      = self.wrapper_dot_product(attr, coeffs.T) + int_
+            idxWage      = np.dot(attr, coeffs.T) + int_
                                        
             # Returns to experience.
             exp    = name[:-1].count('1')
@@ -213,15 +204,15 @@ class agentCls(meta):
             attr         = self.attr['attr']['utility']
                     
             coeffs, int_ = parasObj.getParameters('utility')
-                   
-            idxUtility   = self.wrapper_dot_product(attr, coeffs.T) + int_ 
+            
+            idxUtility   = np.dot(attr, coeffs.T) + int_ 
 
             # Pleasure of children.
             attr       = self.attr['attr']['children']
                             
             coeffs     = parasObj.getParameters('child')
                     
-            idxUtility = idxUtility + self.wrapper_dot_product(children, coeffs) 
+            idxUtility = idxUtility + np.dot(children, coeffs) 
             
             # Collect information
             self.attr['u']['exAnte'][name] = spouse + idxUtility              
@@ -260,7 +251,7 @@ class agentCls(meta):
         v['lower'] = self.attr['v']['exAnte'][names['lower']]
             
                         
-        prob = self.wrapper_norm_cdf(-(v['upper'] - v['lower']), 0.0, xi['sd'])
+        prob = scipy.stats.norm.cdf(-(v['upper'] - v['lower']), 0.0, xi['sd'])
         
         self.attr['probs'][names['upper']] = 1.0 - prob 
 
@@ -338,12 +329,12 @@ class agentCls(meta):
             
             eval_ = (cutoff - v['mean'])/v['sd']
             
-            cdf   = self.wrapper_norm_cdf(eval_, 0.00, 1.0)
+            cdf   = scipy.stats.norm.cdf(eval_, 0.00, 1.0)
             
-            pdf   = self.wrapper_norm_pdf(eval_, 0.00, 1.0)
+            pdf   = scipy.stats.norm.pdf(eval_, 0.00, 1.0)
             
             # Stabilization
-            cdf   = self.wrapper_clip_value(cdf, 1e-10, 1.0 - 1e-10)
+            cdf   = np.clip(cdf, 1e-10, 1.0 - 1e-10)
             
             # Request.
             if(direction == 'lower'):
@@ -421,7 +412,7 @@ class agentCls(meta):
         # Calculate wage.
         coeffs, int_ = parasObj.getParameters('wage')
 
-        wage         = self.wrapper_dot_product(attr, coeffs.T) + int_ + eta
+        wage         = np.dot(attr, coeffs.T) + int_ + eta
         
         
         coeffs       = parasObj.getParameters('experience')

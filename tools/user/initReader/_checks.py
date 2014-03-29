@@ -24,6 +24,10 @@ def _basics(initDict):
 
     if(isRestart): assert (os.path.exists('stepParas.struct.out') == True)
     
+    ''' Experience present.
+    '''
+    assert (len(initDict['WAGE']['exper']['pos']) > 0)
+    
     ''' There is at least one free parameter.
     '''
     isFree = []
@@ -57,6 +61,20 @@ def _basics(initDict):
         mpi4py = False
         
     if(not mpi4py): assert (initDict['EST']['processors'] ==  1) 
+
+    ''' Acceleration.
+    '''
+    fortran = True
+    
+    try:
+        
+        import tools.computation.f90.f90_main as fort 
+
+    except ImportError:
+        
+        fortran = False
+    
+    if(not fortran): assert (initDict['EST']['accelerated'] == False)
 
 def _identification(initDict):
     ''' Check for identification.

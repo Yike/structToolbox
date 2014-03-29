@@ -10,7 +10,7 @@ class optRequestCls(meta):
         self.attr = {}
         
         self.attr['userRequestObj'] = None
-
+        
         self.attr['optimization']   = None
 
         self.attr['commObj']        = None

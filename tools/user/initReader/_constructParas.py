@@ -25,14 +25,6 @@ def _constructParas(initDict):
     isFree = initDict['CHILD']['coeffs']['free'][0] 
     
     parasObj.addParameter('CHILD', None, value, isFree)
-        
-    ''' EXPERIENCE
-    '''    
-    value  = initDict['EXPERIENCE']['coeffs']['value'][0]
-    
-    isFree = initDict['EXPERIENCE']['coeffs']['free'][0] 
-        
-    parasObj.addParameter('EXPERIENCE', None, value, isFree)
     
     ''' UTILITY
     '''
@@ -65,7 +57,14 @@ def _constructParas(initDict):
             parasObj.addParameter('WAGE', subtype, value, isFree[count])
             
             count = count + 1
-            
+    
+    # Special treatment of experience.
+    value  = initDict['WAGE']['exper']['value'][0]
+    
+    isFree = initDict['WAGE']['exper']['free'][0] 
+        
+    parasObj.addParameter('EXPERIENCE', None, value, isFree)
+    
     ''' SHOCKS
     '''
     for subtype in ['eps', 'eta', 'rho']:

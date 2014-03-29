@@ -85,7 +85,37 @@ class testCls(object):
             
             
             assert_true(np.allclose(f90, py) == True)
-                        
+
+    def test_case_4(self):
+        ''' Test sqrt calculation.
+        '''
+        
+        for _ in range(1000):
+    
+            eval_ = np.random.normal(scale = 10)**2
+   
+            f90   = fort.wrapper_sqrt(eval_)  
+            
+            py    = np.sqrt(eval_)
+            
+            
+            assert_true(np.allclose(f90, py) == True)        
+
+    def test_case_5(self):
+        ''' Test log calculation.
+        '''
+        
+        for _ in range(1000):
+    
+            eval_ = np.random.normal(scale = 10)**2 
+   
+            f90   = fort.wrapper_log(eval_)  
+            
+            py    = np.log(eval_)
+            
+            
+            assert_true(np.allclose(f90, py) == True)        
+                            
 ''' Execution of module as script.
 '''
 if __name__ == '__main__':

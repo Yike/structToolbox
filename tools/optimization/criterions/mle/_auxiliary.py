@@ -4,9 +4,10 @@
 
 # standard library
 import scipy.stats
+from scipy.stats import norm
+
 
 import numpy        as np
-import tools.computation.f90.f90_main     as fort
 
 def cdfConditional_single(eval_, u, v, real):
     ''' Evaluate the cumulative distribution function of the conditional
@@ -18,7 +19,7 @@ def cdfConditional_single(eval_, u, v, real):
     sd   = np.sqrt((1.0 - u['rho']['eta']**2)*u['sd']**2)
 
     # Compute results
-    rslt = fort.wrapper_norm_cdf(eval_ - mean, 0.0, sd)
+    rslt = norm.cdf(eval_ - mean, 0.0, sd)
 
     # Finishing.
     return rslt  
@@ -33,7 +34,7 @@ def cdfConditional_multiple(eval_, u, v, real):
     sd   = np.sqrt((1.0 - u['rho']['eta']**2)*u['sd']**2)
 
     # Compute results
-    rslt = scipy.stats.norm.cdf(eval_ - mean, 0.0, sd)
+    rslt = norm.cdf(eval_ - mean, 0.0, sd)
 
     # Finishing.
     return rslt  

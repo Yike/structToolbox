@@ -22,4 +22,3 @@ class requestCls(meta):
         # Status indicator.
         self.isLocked = False
         
-    

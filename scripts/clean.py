@@ -29,7 +29,7 @@ def _distributeInput(parser):
 parser = argparse.ArgumentParser(description = 
 'Cleanup for structEstimator.')
 
-parser.add_argument('-restart', \
+parser.add_argument('--restart', \
                     action  = 'store_true', \
                     dest    = 'restart', \
                     default = False, \

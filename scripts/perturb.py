@@ -36,13 +36,13 @@ def process(args):
 '''
 parser  = argparse.ArgumentParser(description = 'Perturb current value of structural parameters.')
 
-parser.add_argument('-seed', \
+parser.add_argument('--seed', \
                     type    = int , \
                     default = 123, \
                     dest    = 'seed', \
                     help    = 'Random Seed')
 
-parser.add_argument('-scale', \
+parser.add_argument('--scale', \
                     type    = float , \
                     default = 0.1, \
                     dest    = 'scale', \

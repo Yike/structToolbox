@@ -56,10 +56,6 @@ class initCls(meta):
                 if(keyword ==  'SPOUSE'):
                         
                     initDict = self._processSPOUSE(initDict, currentLine) 
-
-                if(keyword ==  'EXPERIENCE'):
-
-                    initDict = self._processEXPERIENCE(initDict, currentLine)  
                                         
                 if(keyword ==  'CHILDREN'):
                         
@@ -137,14 +133,14 @@ class initCls(meta):
         
         # Position and number of different attributes
         pos = []
+
+        pos = pos + initDict['UTILITY']['coeffs']['pos']
         
         pos = pos + initDict['CHILD']['coeffs']['pos']
     
         pos = pos + initDict['WAGE']['coeffs']['pos']
-    
-        pos = pos + initDict['UTILITY']['coeffs']['pos']
-
-        pos = pos + initDict['EXPERIENCE']['coeffs']['pos']
+        
+        pos = pos + initDict['WAGE']['exper']['pos']
                 
         pos = list(set(pos))
         
@@ -181,7 +177,18 @@ class initCls(meta):
             
             initDict['WAGE']['coeffs']['free']  += [isFree] 
             
-        
+        if(keyword in ['exper']):
+            
+            pos   = int(currentLine[1])
+            
+            value, isFree = aux._processLine(currentLine[2])
+            
+            initDict['WAGE']['exper']['pos']   += [pos] 
+ 
+            initDict['WAGE']['exper']['value'] += [value] 
+            
+            initDict['WAGE']['exper']['free']  += [isFree] 
+                    
         if(keyword in ['int']):
             
             value, isFree = aux._processLine(currentLine[1])
@@ -254,33 +261,6 @@ class initCls(meta):
         # Finishing.
         return initDict
 
-    def _processEXPERIENCE(self, initDict, currentLine):
-        ''' Process optimization details.
-        '''
-        # Antibugging.
-        assert (isinstance(initDict, dict))
-        assert (isinstance(currentLine, list))
-        
-        # Process information.    
-        keyword = currentLine[0]
-        flag    = currentLine[1]
-
-        # Construct dictionary.          
-        if(keyword in ['coeff']):
-            
-            pos = int(flag)
-            
-            value, isFree = aux._processLine(currentLine[2])
-                        
-            initDict['EXPERIENCE']['coeffs']['pos']   = [pos]
-
-            initDict['EXPERIENCE']['coeffs']['value'] = [value]
-
-            initDict['EXPERIENCE']['coeffs']['free']  = [isFree]
-            
-        # Finishing.
-        return initDict
-    
     def _processSHOCKS(self, initDict, currentLine):
         ''' Process optimization details.
         '''
@@ -346,7 +326,7 @@ class initCls(meta):
         keyword = currentLine[0]
         flag    = currentLine[1]
         
-        if(keyword in ['restart']):
+        if(keyword in ['restart', 'accelerated']):
                             
             if(flag.upper() == 'FALSE'):
                                 
@@ -469,8 +449,6 @@ class initCls(meta):
         initDict['PARAS']   = None
 
 
-        initDict['EXPERIENCE']  = {}
-
         initDict['UTILITY']     = {}
         
         initDict['BASICS']      = {}
@@ -492,14 +470,6 @@ class initCls(meta):
         initDict['SIM']         = {}   
         
         
-        initDict['EXPERIENCE']['coeffs'] = {}
-
-        initDict['EXPERIENCE']['coeffs']['value'] = []
-        
-        initDict['EXPERIENCE']['coeffs']['pos']   = []
-
-        initDict['EXPERIENCE']['coeffs']['free']  = []
-                        
 
         initDict['CHILD']['coeffs'] = {}
 
@@ -526,14 +496,16 @@ class initCls(meta):
         initDict['UTILITY']['int']['free']  = []
 
 
-        initDict['WAGE']['coeffs']    = {}
+        for keyword in ['coeffs', 'exper']:
 
-        initDict['WAGE']['coeffs']['value']  = []
-
-        initDict['WAGE']['coeffs']['pos']    = []
-
-        initDict['WAGE']['coeffs']['free']   = []
-
+            initDict['WAGE'][keyword] = {}
+    
+            initDict['WAGE'][keyword]['value']  = []
+    
+            initDict['WAGE'][keyword]['pos']    = []
+    
+            initDict['WAGE'][keyword]['free']   = []
+    
 
         initDict['WAGE']['int']    = {}
         

@@ -32,7 +32,7 @@ class testCls(object):
         estimate(initFile = '../dat/testD.ini', dataFile = 'testD.pkl')
          
         rslt = pkl.load(open('rslt.struct.pkl', 'r'))
-       
+
         assert_true(np.allclose(rslt['fun'], -0.58179596977255987) == True)
 
 ''' Execution of module as script.

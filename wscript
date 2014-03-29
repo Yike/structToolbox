@@ -3,7 +3,6 @@
 # standard library
 import os
 import glob
-import stat
 import shutil
 import fnmatch
 
@@ -15,8 +14,18 @@ def options(opt):
     opt.load('compiler_c')
 
     opt.load('compiler_fc')
-
+    
+    opt.add_option('--speed', \
+                    action  = 'store_true', \
+                    dest    = 'speed', \
+                    default = False, \
+                    help    = 'Compile Fortran library for faster estimation.')
+        
 def configure(conf):
+    
+    # Distribute options.
+    speed = conf.options.speed
+    
 
     conf.env.project_paths = {}
 
@@ -28,21 +37,33 @@ def configure(conf):
 
     conf.load('runPyScript', tooldir = tools_dir)
     
-    conf.load('compiler_fc')
+
+    if(speed):
+        
+        conf.load('compiler_fc')
 
 def build(bld):
+    
+    # Distribute options.
+    speed = bld.options.speed
     
     bld.env.PROJECT_PATHS = set_project_paths(bld)
 
     os.chdir(bld.env.project_paths['STRUCT_TOOLBOX'])
 
     set_permissions()
+    
+    if(speed):
+        
+        bld.recurse('tools/computation/f90')
+    
+    nose = get_nose()
+    
+    if(nose):
 
-    bld.recurse('tools/computation/f90')
-
-    bld.add_group() 
-
-    bld.recurse('tests')
+        bld.add_group() 
+    
+        bld.recurse('tests')
 
 def distclean(ctx):
     
@@ -58,6 +79,22 @@ def distclean(ctx):
     
 ''' Auxiliary functions.
 '''
+def get_nose():
+    ''' Check for nose unit-testing framework.
+    '''
+    nose = True
+    
+    try:
+        
+        import nose
+    
+    except ImportError:
+        
+        nose = False
+        
+    # Finishing.
+    return nose
+    
 def set_permissions():
     ''' Set permissions.
     '''
@@ -92,7 +129,8 @@ def remove_filetypes_distclean(path):
     for root, _, filenames in os.walk('.'):
 
         for filetypes in ['*.aux','*.log','*.pyc', '*.so', '*~', '*tar', \
-            '*.zip', '.waf*', '*lock*', '*.mod', '*.a', '*.pkl', '*.out', '*.pyo', '*.info']:
+            '*.zip', '.waf*', '*lock*', '*.mod', '*.a', '*.pkl', '*.out', '*.pyo', '*.info',\
+            '.pid']:
 
                 for filename in fnmatch.filter(filenames, filetypes):
                     

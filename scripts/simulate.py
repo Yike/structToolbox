@@ -87,7 +87,7 @@ def simulate(initFile = 'init.ini', dataFile = 'obsEconomy.pkl', update = False)
         attr['spouse'] = income
 
         # Experience.
-        pos = initDict['EXPERIENCE']['coeffs']['pos']
+        pos = initDict['WAGE']['exper']['pos']
     
         attr['experience'] = [0.0]
                     
@@ -219,13 +219,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 
       'Simulation of economy for the structToolbox.')
 
-    parser.add_argument('-init', \
+    parser.add_argument('--init', \
                         action  = 'store', \
                         dest    = 'init', \
                         default = 'init.ini', \
                         help    = 'Configuration for simulation.')
     
-    parser.add_argument('-update', \
+    parser.add_argument('--update', \
                         action  = 'store_true', \
                         dest    = 'update', \
                         default = False, \

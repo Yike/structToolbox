@@ -199,13 +199,13 @@ class scipyCls(meta):
         assert (x.dtype == 'float')
         
         # Distribute class attributes.
-        parasObj   = self.attr['parasObj']
+        parasObj    = self.attr['parasObj']
         
-        obsEconomy = self.attr['obsEconomy']
+        obsEconomy  = self.attr['obsEconomy']
 
-        static     = self.attr['static']
+        static      = self.attr['static']
 
-        commObj    = self.attr['commObj']
+        commObj     = self.attr['commObj']
                         
         # Update parameters.
         parasObj.update(x, 'external', 'free')

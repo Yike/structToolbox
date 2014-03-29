@@ -2,13 +2,12 @@
 '''
 
 # standard library
-import scipy.stats
 import numpy        as np
+from scipy.stats import norm
 
 # project library
 from _auxiliary import cdfConditional_single, cdfConditional_multiple
 
-import tools.computation.f90.f90_main     as    fort
 
 def sampleLikelihood(obsEconomy, parasObj, static, commObj):
     ''' Function calculates the sample likelihood.
@@ -19,7 +18,7 @@ def sampleLikelihood(obsEconomy, parasObj, static, commObj):
     # Select implementation
     if(static): 
         
-        likl = _speedyCalculation(obsEconomy, parasObj)
+        likl = _staticCalculation(obsEconomy, parasObj)
     
     else:
     
@@ -44,7 +43,7 @@ def sampleLikelihood(obsEconomy, parasObj, static, commObj):
 
 ''' Private functions.
 '''
-def _speedyCalculation(obsEconomy, parasObj):
+def _staticCalculation(obsEconomy, parasObj):
     ''' Calculation of sample likelihood.
     '''
     # Distribute class attributes
@@ -93,7 +92,7 @@ def _speedyCalculation(obsEconomy, parasObj):
     # Home.
     xi   = parasObj.getParameters('xi')
                                             
-    home = scipy.stats.norm.cdf(-xiStar, xi['mean'], xi['sd'])
+    home = norm.cdf(-xiStar, xi['mean'], xi['sd'])
         
     # Working.
     eta  = parasObj.getParameters('eta')
@@ -101,7 +100,7 @@ def _speedyCalculation(obsEconomy, parasObj):
     # Working (unconditional)  
     real = wages - idxWage
     
-    unconditional = scipy.stats.norm.pdf(real, eta['mean'], eta['sd'])      
+    unconditional = norm.pdf(real, eta['mean'], eta['sd'])      
     
     conditional = 1.0 - cdfConditional_multiple(-xiStar, xi, eta, real) 
 
@@ -177,17 +176,17 @@ def _individualLikelihood(agentObj, parasObj, period):
     
     # Select calculation.
     if(choice == 0):
-                    
-        prob = fort.wrapper_norm_cdf(-xiStar, xi['mean'], xi['sd'])
+        
+        prob = norm.cdf(-xiStar, xi['mean'], xi['sd'])
                 
     else:
                                                             
         ''' Unconditional distribution.
         '''              
         real          = wage - idxWage
-                                
-        unconditional = fort.wrapper_norm_pdf(real, eta['mean'], eta['sd'])
-                                   
+        
+        unconditional = norm.pdf(real, eta['mean'], eta['sd'])
+                                 
         ''' Conditional distribution.
         '''
         conditional = 1.0 - cdfConditional_single(-xiStar, xi, eta, real) 
