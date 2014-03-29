@@ -148,7 +148,7 @@ if __name__ == '__main__':
                         default = False, \
                         help    = 'Update parameter class.')
     
-    #fork() 
+    fork() 
      
     initFile, update, dataFile = _distributeInput(parser)
         
