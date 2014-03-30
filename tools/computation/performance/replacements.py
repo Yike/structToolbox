@@ -14,8 +14,6 @@ def replacements():
         
     scipy.stats.norm.cdf = fort.wrapper_norm_cdf
         
-    np.dot               = fort.wrapper_dotproduct
-        
     np.clip              = fort.wrapper_clip_value
     
     np.sqrt              = fort.wrapper_sqrt

@@ -96,7 +96,7 @@ class scipyCls(meta):
         
         else:
             
-            sys.stdout = open('scipy.struct.log', 'w')
+            sys.stdout = open('scipy.struct.log', 'a')
             
             if(optimizer == 'SCIPY-POWELL'):
                 
