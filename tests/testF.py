@@ -60,15 +60,17 @@ class testCls(object):
     def test_case_1(self):
         
         mpi4py, fortran = _checkEnvironment()
+
+        if(not (mpi4py)):  return
+                
+        if(not (fortran)): return
         
+        
+                    
         simulate(initFile = '../dat/testF_parallel_function.ini', dataFile = 'obsEconomy.pkl')
 
         for file_ in ['testF_parallel_function.ini', 'testF_parallel_gradient.ini']:        
-            
-            if(('parallel' in file_) and not (mpi4py)):     continue
-                
-            if(('accelerated' in file_) and not (fortran)): continue
-            
+                    
             estimate(initFile = '../dat/' + file_, dataFile = 'obsEconomy.pkl')
             
             rslt = pkl.load(open('rslt.struct.pkl', 'r'))
