@@ -34,4 +34,4 @@ def build(bld):
     
     bld.add_group()
     
-    #bld(features = 'run_py_script', source = 'testF.py', target = "",  version = 2)
+    bld(features = 'run_py_script', source = 'testF.py', target = "",  version = 2)

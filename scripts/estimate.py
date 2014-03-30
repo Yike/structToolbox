@@ -85,6 +85,19 @@ def estimate(initFile = 'init.ini', update = False, dataFile = 'obsEconomy.pkl')
 
 ''' Auxiliary functions.
 '''
+def cleanup():
+    ''' Remove results from previous estimation run. All other files
+        are immediately overwritten.
+    '''
+
+    try:
+        
+        os.remove('rslt.struct.pkl')
+        
+    except OSError:
+        
+        pass
+    
 def _distributeInput(parser):
     ''' Check input for estimation script.
     '''
@@ -147,6 +160,8 @@ if __name__ == '__main__':
                         dest    = 'update', \
                         default = False, \
                         help    = 'Update parameter class.')
+    
+    cleanup()
     
     fork() 
      

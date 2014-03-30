@@ -59,7 +59,6 @@ class testCls(object):
     
     def test_case_1(self):
         
-        
         mpi4py, fortran = _checkEnvironment()
         
         simulate(initFile = '../dat/testF_parallel_function.ini', dataFile = 'obsEconomy.pkl')
@@ -74,10 +73,7 @@ class testCls(object):
             
             rslt = pkl.load(open('rslt.struct.pkl', 'r'))
    
-            print rslt['fun']
-            
-        assert_true(np.allclose(rslt['fun'], -0.58179596977255987) == True)
-        
+            assert_true(np.allclose(rslt['fun'], 2.37167114431) == True)     
         
 ''' Execution of module as script.
 '''
