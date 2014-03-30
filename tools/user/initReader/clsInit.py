@@ -320,6 +320,10 @@ class initCls(meta):
             
             flag = int(flag)
         
+        if(keyword in ['parallelization']):
+            
+            flag = str(flag)
+        
         # Construct dictionary.        
         initDict['EST'][keyword] = flag
         

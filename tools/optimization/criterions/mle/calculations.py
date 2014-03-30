@@ -9,30 +9,17 @@ from scipy.stats import norm
 from _auxiliary import cdfConditional_single, cdfConditional_multiple
 
 
-def sampleLikelihood(obsEconomy, parasObj, static, commObj):
+def sampleLikelihood(obsEconomy, parasObj, static):
     ''' Function calculates the sample likelihood.
     '''
-    # Distribute class attributes.
-    numAgents = obsEconomy.getAttr('numAgents')
-
     # Select implementation
     if(static): 
         
         likl = _staticCalculation(obsEconomy, parasObj)
     
     else:
-    
-        # Calculate likelihood.        
-        if(commObj is not None):
-            
-            likl = commObj.evaluate(parasObj)
-            
-        else:
         
-            likl = _scalarEvaluations(obsEconomy, parasObj)
-
-    # Scaling.
-    likl = (1.0/float(numAgents))*likl
+        likl = _scalarEvaluations(obsEconomy, parasObj)
 
     # Quality checks
     assert (np.isfinite(likl))
@@ -47,6 +34,8 @@ def _staticCalculation(obsEconomy, parasObj):
     ''' Calculation of sample likelihood.
     '''
     # Distribute class attributes
+    numAgents = obsEconomy.getAttr('numAgents')
+    
     attr      = obsEconomy.getAttr('attr')
     
     wages     = obsEconomy.getAttr('wages') 
@@ -117,6 +106,9 @@ def _staticCalculation(obsEconomy, parasObj):
     
     likl = np.sum(prob)
     
+    # Scaling.
+    likl = (1.0/float(numAgents))*likl
+    
     # Finishing
     return likl
 
@@ -124,6 +116,8 @@ def _scalarEvaluations(obsEconomy, parasObj):
     ''' Calculation of likelihood using OOP paradigm.
     '''
     # Distribute class attributes.
+    numAgents  = obsEconomy.getAttr('numAgents')
+    
     numPeriods = obsEconomy.getAttr('numPeriods')
     
     agentObjs  = obsEconomy.getAttr('agentObjs')
@@ -148,7 +142,10 @@ def _scalarEvaluations(obsEconomy, parasObj):
                                                
             # Collect results.
             likl = likl + prob
-
+    
+    # Scaling.
+    likl = (1.0/float(numAgents))*likl
+    
     # Finishing.
     return likl
 

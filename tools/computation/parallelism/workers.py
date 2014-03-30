@@ -34,21 +34,50 @@ agentObjs  = obsEconomy.getAttr('agentObjs')
 
 parasObj   = obsEconomy.getAttr('parasObj')
 
+numParas   = parasObj.getAttr('numParas')
+
+numFree    = parasObj.getAttr('numFree')
+
+
+''' Strategy.
+'''
+cmd = np.array(0, dtype = 'int32')
+    
+comm.Bcast([cmd, MPI.INT], root = 0)    
+
+strategy = 'function'
+
+if(cmd == 1): strategy = 'gradient'
+
 ''' Set up small economy.
 '''
-agentObjs = aux.splitList(agentObjs, size)[rank]
+if(strategy == 'function'):
+    
+    agentObjs = aux.splitList(agentObjs, size)[rank]
 
+    
+    economyObj = economyCls()
+    
+    economyObj.setAttr('agentObjs', agentObjs)
+    
+    economyObj.setAttr('parasObj', parasObj)
+    
+    economyObj.lock()
 
-economyObj = economyCls()
+else:
 
-economyObj.setAttr('agentObjs', agentObjs)
+    packets  = range(numFree)
+    
+    packet   = aux.splitList(packets, size)[rank]
+    
+    numEvals = len(packet)
+    
 
-economyObj.setAttr('parasObj', parasObj)
+    economyObj = obsEconomy
 
-economyObj.lock()
+numSubset = economyObj.getAttr('numAgents')
 
-
-numParas = parasObj.getAttr('numParas')
+numAgents = obsEconomy.getAttr('numAgents')
 
 ''' Core of algorithm.
 '''
@@ -61,20 +90,80 @@ while True:
 
     # Compute likelihood.
     if(cmd == 1):
-
-        # Process new parametrization.
-        paraVals = np.tile(np.nan, numParas) 
-
-        comm.Bcast([paraVals, MPI.FLOAT], root = 0) 
         
-        parasObj.update(paraVals, 'internal', 'all')
+        if(strategy == 'function'):
 
-        # Evaluate likelihood.
-        likl =  _scalarEvaluations(economyObj, parasObj)
+            # Process new parametrization.
+            paraVals = np.tile(np.nan, numParas) 
+    
+            comm.Bcast([paraVals, MPI.FLOAT], root = 0) 
+            
+            parasObj.update(paraVals, 'internal', 'all')
+    
+            # Evaluate likelihood.
+            likl = _scalarEvaluations(economyObj, parasObj)
+    
+            # Scaling.
+            likl = (numSubset*likl)/float(numAgents)
+            
+            # Reduce operation.
+            comm.Reduce([likl, MPI.DOUBLE], None, op = MPI.SUM, root = 0)
+        
+        else:
+            
+            # Process new parametrization.
+            paraVals = np.tile(np.nan, numParas) 
+    
+            comm.Bcast([paraVals, MPI.FLOAT], root = 0) 
+            
+            parasObj.update(paraVals, 'internal', 'all')
+            
+            # Epsilon.
+            epsilon = np.tile(np.nan, 1)
+            
+            comm.Bcast([epsilon, MPI.FLOAT], root = 0) 
+            
+            # Get baseline evaluation.
+            f0 = np.tile(np.nan, 1)
+            
+            comm.Bcast([f0, MPI.FLOAT], root = 0) 
+            
+            
+            x = parasObj.getValues('external', 'free')
+            
+            
+            rslt = np.zeros(numFree, dtype = 'float')
+           
+            ei   = np.zeros(numFree, dtype = 'float')
+            
+            pack = np.zeros(numEvals, dtype = 'float')
 
-        # Reduce operation.
-        comm.Reduce([likl, MPI.DOUBLE], None, op = MPI.SUM, root = 0)
+            # Evaluate gradient.
+            count = 0
+            
+            for k in packet:
+                
+                ei[k]    = 1.0
+                
+                d        = epsilon*ei
+                
+                paraVals = x + d
+                
+                parasObj.update(paraVals, 'external', 'free')
+    
+                f1      = _scalarEvaluations(economyObj, parasObj)
+                
+                rslt[k] = (f1 - f0)/d[k]
+                
+                ei[k]   = 0.0
+            
+            
+                pack[count] = rslt[k]
+            
+                count       = count + 1
 
+            comm.Send([pack, MPI.DOUBLE], dest = 0, tag = rank)
+            
     # Terminate.           
     if(cmd == -1): 
         

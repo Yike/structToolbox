@@ -30,13 +30,15 @@ def optimize(requestObj):
     derived      = requestObj.getAttr('derived')             
     
     # Further information.
-    accelerated = estimation['accelerated']
+    parallelization = estimation['parallelization']
     
-    isRestart   = estimation['restart']
+    accelerated     = estimation['accelerated']
     
-    numProcs    = estimation['processors']
+    isRestart       = estimation['restart']
+    
+    numProcs        = estimation['processors']
 
-    static      = derived['static']
+    static          = derived['static']
     
     ''' Performance
     '''
@@ -49,9 +51,11 @@ def optimize(requestObj):
     if(numProcs > 1):
         
         commObj = commCls()
-        
+                
         commObj.setAttr('numProcs', numProcs)
-    
+        
+        commObj.setAttr('strategy', parallelization)
+        
         commObj.lock()
         
         commObj.initialize()

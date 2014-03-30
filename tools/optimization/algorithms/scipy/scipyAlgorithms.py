@@ -160,7 +160,7 @@ class scipyCls(meta):
         ftol   = opts['ftol']
                 
         maxfun = opts['maxfun']
-    
+            
         # Interface to algorithm.
         opt = fmin_powell(self._criterionFunction, startVals, \
                     xtol = xtol, ftol = ftol, maxiter = maxiter, \
@@ -187,7 +187,81 @@ class scipyCls(meta):
         return rslt
 
     ''' Private methods.
-    '''   
+    '''
+    def _derivedAttributes(self):
+        ''' Compute derived attributes.
+        '''
+        # Antibugging.
+        assert (self.getStatus() == True)
+        
+        # Distribute class attributes.
+        startVals = self.attr['startVals']
+        
+        optsDict  = self.attr['optsDict']
+        
+        optimizer = self.attr['optimization']['optimizer']
+        
+        # Collect derived attributes.
+        self.attr['numFree'] = len(startVals)
+        
+        if(optimizer in ['SCIPY-BFGS']):
+            
+            self.attr['epsilon'] = optsDict['SCIPY-BFGS']['epsilon']
+        
+    def _gradientFunction(self, x):
+        ''' Gradient function.
+        '''   
+        # Antibugging.
+        assert (self.getStatus() == True)
+        assert (isinstance(x, np.ndarray))
+        assert (np.all(np.isfinite(x)))
+        assert (x.ndim == 1)
+        assert (x.dtype == 'float')
+   
+        # Distribute class attributes.
+        parasObj = self.attr['parasObj']
+
+        commObj  = self.attr['commObj']
+
+        numFree = self.attr['numFree']
+            
+        epsilon = self.attr['epsilon']
+        
+        # Update parameters.
+        parasObj.update(x, 'external', 'free')
+        
+        # Initial evaluation.
+        f0 = self._criterionFunction(x) 
+                
+        if((commObj is None) or (commObj.getAttr('strategy') == 'function')):
+
+            # Initialize auxiliary containers.
+            rslt = np.zeros(numFree, dtype = 'float')
+           
+            ei   = np.zeros(numFree, dtype = 'float')
+    
+            # Approximate gradient.
+            for k in range(numFree):
+                
+                ei[k]   = 1.0
+                
+                d       = epsilon*ei
+                
+                eval_   = x + d
+                
+                f1      = self._criterionFunction(eval_)
+                
+                rslt[k] = (f1 - f0)/d[k]
+                
+                ei[k]   = 0.0
+
+        elif(commObj.getAttr('strategy') == 'gradient'):
+
+            rslt = commObj.evaluateGradient(parasObj, f0, epsilon)
+   
+        # Finishing.
+        return rslt  
+    
     def _criterionFunction(self, x):
         ''' SciPy wrapper for criterion function.
         '''
@@ -199,20 +273,30 @@ class scipyCls(meta):
         assert (x.dtype == 'float')
         
         # Distribute class attributes.
-        parasObj    = self.attr['parasObj']
+        parasObj   = self.attr['parasObj']
         
-        obsEconomy  = self.attr['obsEconomy']
+        obsEconomy = self.attr['obsEconomy']
 
-        static      = self.attr['static']
+        static     = self.attr['static']
 
-        commObj     = self.attr['commObj']
+        commObj    = self.attr['commObj']
                         
         # Update parameters.
         parasObj.update(x, 'external', 'free')
                 
         # Criterion function.    
-        rslt = sampleLikelihood(obsEconomy, parasObj, static, commObj)
+        if(commObj is None):
+            
+            rslt = sampleLikelihood(obsEconomy, parasObj, static)
         
+        elif(commObj.getAttr('strategy') == 'function'):
+
+            rslt = commObj.evaluateFunction(parasObj)
+        
+        else:
+            
+            rslt = sampleLikelihood(obsEconomy, parasObj, static)
+            
         # Collect results.
         self.attr['fval']['current'] = rslt
         

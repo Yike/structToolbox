@@ -62,10 +62,9 @@ class testCls(object):
         
         mpi4py, fortran = _checkEnvironment()
         
-        simulate(initFile = '../dat/testE_scalar.ini', dataFile = 'obsEconomy.pkl')
+        simulate(initFile = '../dat/testF_parallel_function.ini', dataFile = 'obsEconomy.pkl')
 
-        for file_ in ['testE_scalar.ini', 'testE_parallel.ini', \
-                      'testE_scalar_accelerated.ini', 'testE_parallel_accelerated.ini']:        
+        for file_ in ['testF_parallel_function.ini', 'testF_parallel_gradient.ini']:        
             
             if(('parallel' in file_) and not (mpi4py)):     continue
                 
@@ -75,7 +74,9 @@ class testCls(object):
             
             rslt = pkl.load(open('rslt.struct.pkl', 'r'))
    
-            assert_true(np.allclose(rslt['fun'], -0.58179596977255987) == True)
+            print rslt['fun']
+            
+        assert_true(np.allclose(rslt['fun'], -0.58179596977255987) == True)
         
         
 ''' Execution of module as script.

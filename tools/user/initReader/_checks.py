@@ -81,7 +81,11 @@ def _basics(initDict):
         fortran = False
     
     if(not fortran): assert (initDict['EST']['accelerated'] == False)
-
+    
+    ''' Parallelization strategies.
+    '''
+    assert (initDict['EST']['parallelization'] in ['function', 'gradient'])
+        
 def _identification(initDict):
     ''' Check for identification.
     '''   
