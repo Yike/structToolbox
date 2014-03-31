@@ -14,6 +14,8 @@ from tools.economics.economy.clsEconomy             import economyCls
 
 from tools.optimization.criterions.mle.calculations import _scalarEvaluations
 
+import tools.computation.performance.performance    as     perf
+
 import _auxiliary as aux
 
 ''' Auxiliary functions.
@@ -39,6 +41,7 @@ numParas   = parasObj.getAttr('numParas')
 numFree    = parasObj.getAttr('numFree')
 
 
+    
 ''' Strategy.
 '''
 cmd = np.array(0, dtype = 'int32')
@@ -48,6 +51,19 @@ comm.Bcast([cmd, MPI.INT], root = 0)
 strategy = 'function'
 
 if(cmd == 1): strategy = 'gradient'
+
+''' Performance enhancements.
+'''
+cmd = np.array(0, dtype = 'int32')
+    
+comm.Bcast([cmd, MPI.INT], root = 0)    
+
+accelerated = False
+
+if(cmd == 1): accelerated = True
+
+perf.initialize(accelerated)
+
 
 ''' Set up small economy.
 '''
@@ -105,6 +121,8 @@ while True:
     
             # Scaling.
             likl = (numSubset*likl)/float(numAgents)
+            
+            likl = np.array(likl)
             
             # Reduce operation.
             comm.Reduce([likl, MPI.DOUBLE], None, op = MPI.SUM, root = 0)

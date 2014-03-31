@@ -1,12 +1,9 @@
 ''' Module that contains the agents class.
 '''
-# standard library
-import scipy.stats
-import numpy as np
-
 # project library
 from tools.clsMeta  import meta
 
+import tools.computation.performance.performance    as perf
 
 class agentCls(meta):
     ''' Class instance that represents the agent.
@@ -106,7 +103,7 @@ class agentCls(meta):
         # Collect information.
         self.attr['wages'] = self.attr['wages'] + [wage] 
         
-        if(working < home): self.attr['wages'][-1] = np.nan
+        if(working < home): self.attr['wages'][-1] = perf.nan
         
         # Count steps.
         self.attr['steps'] = self.attr['steps'] + 1
@@ -170,7 +167,7 @@ class agentCls(meta):
         children = self.attr['attr']['children']
                  
         # Initialize containers.
-        self.attr['w']['exAnte'][name] = np.nan
+        self.attr['w']['exAnte'][name] = perf.nan
          
         # Compute relevant utility. 
         if(name[-1] == '1'):
@@ -184,7 +181,7 @@ class agentCls(meta):
             
             coeffs, int_ = parasObj.getParameters('wage')
             
-            idxWage      = np.dot(attr, coeffs.T) + int_
+            idxWage      = perf.dot(attr, coeffs.T) + int_
                                        
             # Returns to experience.
             exp    = name[:-1].count('1')
@@ -205,14 +202,14 @@ class agentCls(meta):
                     
             coeffs, int_ = parasObj.getParameters('utility')
             
-            idxUtility   = np.dot(attr, coeffs.T) + int_ 
+            idxUtility   = perf.dot(attr, coeffs.T) + int_ 
 
             # Pleasure of children.
             attr       = self.attr['attr']['children']
                             
             coeffs     = parasObj.getParameters('child')
                     
-            idxUtility = idxUtility + np.dot(children, coeffs) 
+            idxUtility = idxUtility + perf.dot(children, coeffs) 
             
             # Collect information
             self.attr['u']['exAnte'][name] = spouse + idxUtility              
@@ -251,7 +248,7 @@ class agentCls(meta):
         v['lower'] = self.attr['v']['exAnte'][names['lower']]
             
                         
-        prob = scipy.stats.norm.cdf(-(v['upper'] - v['lower']), 0.0, xi['sd'])
+        prob = perf.norm_cdf(-(v['upper'] - v['lower']), 0.0, xi['sd'])
         
         self.attr['probs'][names['upper']] = 1.0 - prob 
 
@@ -329,12 +326,12 @@ class agentCls(meta):
             
             eval_ = (cutoff - v['mean'])/v['sd']
             
-            cdf   = scipy.stats.norm.cdf(eval_, 0.00, 1.0)
+            cdf   = perf.norm_cdf(eval_, 0.00, 1.0)
             
-            pdf   = scipy.stats.norm.pdf(eval_, 0.00, 1.0)
+            pdf   = perf.norm_pdf(eval_, 0.00, 1.0)
             
             # Stabilization
-            cdf   = np.clip(cdf, 1e-10, 1.0 - 1e-10)
+            cdf   = perf.clip(cdf, 1e-10, 1.0 - 1e-10)
             
             # Request.
             if(direction == 'lower'):
@@ -369,8 +366,8 @@ class agentCls(meta):
         eta = conditionalExpectation(self, eta, xi, rho, eval_, 'upper')
         
         # Quality checks.
-        assert (np.isfinite(eps))
-        assert (np.isfinite(eta))
+        assert (perf.isfinite(eps))
+        assert (perf.isfinite(eta))
             
         # Finishing.
         return eps, eta
@@ -412,7 +409,7 @@ class agentCls(meta):
         # Calculate wage.
         coeffs, int_ = parasObj.getParameters('wage')
 
-        wage         = np.dot(attr, coeffs.T) + int_ + eta
+        wage         = perf.dot(attr, coeffs.T) + int_ + eta
         
         
         coeffs       = parasObj.getParameters('experience')
@@ -437,7 +434,7 @@ class agentCls(meta):
         # Draw disturbances.
         cov = parasObj.getParameters('shocks')
         
-        eps, eta = np.random.multivariate_normal(mean = [0.0, 0.0], cov = cov)
+        eps, eta = perf.random_multivariate_normal(mean = [0.0, 0.0], cov = cov)
         
         # Finishing.
         return eps, eta

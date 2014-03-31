@@ -7,7 +7,7 @@ from scipy.stats import norm
 
 # project library
 from _auxiliary import cdfConditional_single, cdfConditional_multiple
-
+import tools.computation.performance.performance    as perf
 
 def sampleLikelihood(obsEconomy, parasObj, static):
     ''' Function calculates the sample likelihood.
@@ -174,7 +174,7 @@ def _individualLikelihood(agentObj, parasObj, period):
     # Select calculation.
     if(choice == 0):
         
-        prob = norm.cdf(-xiStar, xi['mean'], xi['sd'])
+        prob = perf.norm_cdf(-xiStar, xi['mean'], xi['sd'])
                 
     else:
                                                             
@@ -182,7 +182,7 @@ def _individualLikelihood(agentObj, parasObj, period):
         '''              
         real          = wage - idxWage
         
-        unconditional = norm.pdf(real, eta['mean'], eta['sd'])
+        unconditional = perf.norm_pdf(real, eta['mean'], eta['sd'])
                                  
         ''' Conditional distribution.
         '''
@@ -191,12 +191,12 @@ def _individualLikelihood(agentObj, parasObj, period):
         prob        = conditional*unconditional
         
     # Aggregation.        
-    prob = np.clip(prob, 1e-20, np.inf)
+    prob = perf.clip(prob, 1e-20, perf.inf)
                         
-    prob = -np.log(float(prob))
+    prob = -perf.log(float(prob))
     
     # Quality checks.
-    assert (np.isfinite(prob))
+    assert (perf.isfinite(prob))
     assert (isinstance(prob, float))
     
     # Finishing.

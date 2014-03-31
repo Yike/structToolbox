@@ -13,6 +13,8 @@ dir_ = os.path.dirname(os.path.realpath(__file__)).replace('/scripts', '')
 sys.path.insert(0, dir_)
 
 # project library
+import tools.computation.performance.performance as perf
+
 from tools.user.interface        import *
 
 from tools.economics.interface   import *
@@ -34,6 +36,9 @@ def simulate(initFile = 'init.ini', dataFile = 'obsEconomy.pkl', update = False)
     
     initObj.lock()
     
+    ''' Performance enhancements.
+    '''
+    perf.initialize(False)
     
     ''' Distribute information.
     '''

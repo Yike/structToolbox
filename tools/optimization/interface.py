@@ -8,10 +8,9 @@ from tools.optimization.algorithms.clsAlgorithms    import algoCls
 
 from tools.optimization.clsOptRequest               import optRequestCls
 
-from tools.computation.performance.replacements     import replacements
-
 from tools.computation.parallelism.clsComm          import commCls
 
+import tools.computation.performance.performance    as     perf
 
 def optimize(requestObj):
     ''' Function for optimization.
@@ -40,9 +39,9 @@ def optimize(requestObj):
 
     static          = derived['static']
     
-    ''' Performance
+    ''' Performance enhancements.
     '''
-    if(accelerated): replacements()
+    perf.initialize(accelerated)
         
     ''' Parallelism
     '''
@@ -53,7 +52,9 @@ def optimize(requestObj):
         commObj = commCls()
                 
         commObj.setAttr('numProcs', numProcs)
-        
+
+        commObj.setAttr('accelerated', accelerated)
+                
         commObj.setAttr('strategy', parallelization)
         
         commObj.lock()

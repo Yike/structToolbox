@@ -26,9 +26,11 @@ class commCls(meta):
         
         self.attr = {}
 
-        self.attr['strategy']   = None
+        self.attr['strategy']    = None
         
-        self.attr['numProcs']   = None
+        self.attr['numProcs']    = None
+
+        self.attr['accelerated'] = None
 
         # Derived attributes.
         self.attr['comm']       = None
@@ -41,7 +43,10 @@ class commCls(meta):
         '''
         
         # Distribute class attributes.
-        strategy = self.attr['strategy']
+        strategy    = self.attr['strategy']
+
+        accelerated = self.attr['accelerated']
+        
         
         file_ =  os.path.dirname(os.path.realpath(__file__)) + '/workers.py'
         
@@ -56,7 +61,14 @@ class commCls(meta):
         if(strategy == 'gradient'): cmd = 1
             
         comm.Bcast([np.array(cmd, dtype = 'int32'), MPI.INT], root = MPI.ROOT)  
+
+        # Broadcast performance information.
+        cmd = 0
         
+        if(accelerated): cmd = 1
+            
+        comm.Bcast([np.array(cmd, dtype = 'int32'), MPI.INT], root = MPI.ROOT)  
+                
         # Finishing.
         self.attr['comm'] = comm
     
