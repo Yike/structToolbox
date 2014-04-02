@@ -20,17 +20,14 @@ from tools.optimization.interface   import optimize
 
 ''' Process initialization file.
 '''
-def estimate(initFile = 'init.ini', update = False, dataFile = 'obsEconomy.pkl'):
+def estimate(initFile = 'init.ini', resume = False):
     ''' Run estimation. 
     '''
     # Antibugging.
     assert (isinstance(initFile, str))
-    assert (isinstance(dataFile, str))
-    
     assert (os.path.exists(initFile))
-    assert (os.path.exists(dataFile))
-    
-    assert (update in [True, False])
+
+    assert (resume in [True, False])
         
     ''' Process initialization file.
     '''
@@ -42,10 +39,8 @@ def estimate(initFile = 'init.ini', update = False, dataFile = 'obsEconomy.pkl')
     
     ''' Distribute information.
     '''
-    obsEconomy = pkl.load(open(dataFile, 'r'))
-    
-    
     initDict = initObj.getAttr('initDict')
+    
     
     optimization = initDict['OPT']
     
@@ -55,9 +50,16 @@ def estimate(initFile = 'init.ini', update = False, dataFile = 'obsEconomy.pkl')
 
     derived      = initDict['DERIV']
 
+
+    file_        = initDict['EST']['file']
+    
+    ''' Load dataset.
+    '''
+    obsEconomy = pkl.load(open(file_ + '.pkl', 'r'))
+    
     ''' Update.
     '''
-    if(update):
+    if(resume):
         
         values = np.genfromtxt(open('stepParas.struct.out', 'r'))
         
@@ -66,7 +68,9 @@ def estimate(initFile = 'init.ini', update = False, dataFile = 'obsEconomy.pkl')
     ''' Construct request.
     ''' 
     requestObj = requestCls()
-    
+
+    requestObj.setAttr('init', initFile)
+        
     requestObj.setAttr('parasObj', parasObj)
     
     requestObj.setAttr('obsEconomy', obsEconomy)
@@ -107,22 +111,18 @@ def _distributeInput(parser):
     # Distribute arguments.
     initFile = args.init 
     
-    update   = args.update
-    
-    dataFile = args.dataFile
+    resume   = args.resume
     
     # Assertions.
-    for file_ in [initFile, dataFile]:
-
-        assert (file_ is not None)
-        assert (os.path.exists(file_))
+    assert (initFile is not None)
+    assert (os.path.exists(initFile))
     
-    assert (update in [False, True])
+    assert (resume in [False, True])
     
-    if(update): assert (os.path.exists('stepParas.struct.out'))
+    if(resume): assert (os.path.exists('stepParas.struct.out'))
     
     # Finishing.
-    return initFile, update, dataFile
+    return initFile, resume
 
 def fork():
     ''' Fork child process to run estimation in the background.
@@ -141,30 +141,24 @@ def fork():
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description = 
-      'Estimation run of the structToolbox.')
-
-    parser.add_argument('--dataFile', \
-                        action  = 'store', \
-                        dest    = 'dataFile', \
-                        default = 'obsEconomy.pkl', \
-                        help    = 'Name of dataset.')
+      'Start of estimation run of the structToolbox.')
     
     parser.add_argument('--init', \
                         action  = 'store', \
                         dest    = 'init', \
                         default = 'init.ini', \
-                        help    = 'Configuration for estimation.')
+                        help    = 'specify initialization file')
     
-    parser.add_argument('--update', \
+    parser.add_argument('--resume', \
                         action  = 'store_true', \
-                        dest    = 'update', \
+                        dest    = 'resume', \
                         default = False, \
-                        help    = 'Update parameter class.')
+                        help    = 'resume estimation run')
     
     cleanup()
     
     fork() 
      
-    initFile, update, dataFile = _distributeInput(parser)
+    initFile, resume = _distributeInput(parser)
         
-    estimate(initFile = initFile, update = update, dataFile = dataFile)
+    estimate(initFile = initFile, resume = resume)

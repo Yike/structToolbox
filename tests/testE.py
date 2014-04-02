@@ -62,7 +62,7 @@ class testCls(object):
         
         mpi4py, fortran = _checkEnvironment()
         
-        simulate(initFile = '../dat/testE_scalar.ini', dataFile = 'obsEconomy.pkl')
+        simulate(initFile = '../dat/testE_scalar.ini')
 
         for file_ in ['testE_scalar.ini', 'testE_parallel.ini', \
                       'testE_scalar_accelerated.ini', 'testE_parallel_accelerated.ini']:        
@@ -71,7 +71,7 @@ class testCls(object):
                 
             if(('accelerated' in file_) and not (fortran)): continue
             
-            estimate(initFile = '../dat/' + file_, dataFile = 'obsEconomy.pkl')
+            estimate(initFile = '../dat/' + file_)
             
             rslt = pkl.load(open('rslt.struct.pkl', 'r'))
    

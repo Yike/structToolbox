@@ -286,8 +286,14 @@ class initCls(meta):
         flag    = currentLine[1]
         
         # Type conversion.
-        flag = int(flag)
-    
+        if(keyword in ['file']):
+            
+            flag = str(flag)
+        
+        else:
+            
+            flag = int(flag)
+            
         # Construct dictionary.        
         initDict['SIM'][keyword] = flag
         
@@ -320,7 +326,7 @@ class initCls(meta):
             
             flag = int(flag)
         
-        if(keyword in ['parallelization']):
+        if(keyword in ['parallelization', 'file']):
             
             flag = str(flag)
         
@@ -418,7 +424,7 @@ class initCls(meta):
         if(keyword == 'periods'):
                         
             flag = int(flag)
-    
+
         # Construct dictionary.        
         initDict['BASICS'][keyword] = flag
         

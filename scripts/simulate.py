@@ -19,13 +19,11 @@ from tools.user.interface        import *
 
 from tools.economics.interface   import *
 
-def simulate(initFile = 'init.ini', dataFile = 'obsEconomy.pkl', update = False):
+def simulate(initFile = 'init.ini', update = False):
     ''' Simulation of agent population.
     '''
     # Antibugging.
-    assert (isinstance(initFile, str))
-    assert (isinstance(dataFile, str))    
-    
+    assert (isinstance(initFile, str))    
     assert (os.path.exists(initFile))
     
     ''' Process initialization file.
@@ -50,6 +48,8 @@ def simulate(initFile = 'init.ini', dataFile = 'obsEconomy.pkl', update = False)
     numAgents  = initDict['SIM']['agents']
     
     seed       = initDict['SIM']['seed']
+    
+    file_      = initDict['SIM']['file']
     
     income     = initDict['SPOUSE']['income']
     
@@ -153,9 +153,9 @@ def simulate(initFile = 'init.ini', dataFile = 'obsEconomy.pkl', update = False)
     
     ''' Store.
     '''
-    economyObj.store(dataFile)
+    economyObj.store(file_ + '.pkl')
     
-    _writeInfo(economyObj, parasObj)
+    _writeInfo(economyObj, parasObj, file_)
 
         
 ''' Auxiliary functions.
@@ -179,21 +179,21 @@ def _distributeInput(parser):
     # Finishing.
     return initFile, update
 
-def _writeInfo(obsEconomy, parasObj):
+def _writeInfo(obsEconomy, parasObj, file_):
     ''' Write some info about the simulated economy to a text file.
     '''
     
     # Write parameters.
     x = parasObj.getValues('internal', 'all')
 
-    np.savetxt('simParas.struct.out', x, fmt = '%15.10f')
+    np.savetxt(file_ + '.paras.struct.out', x, fmt = '%15.10f')
     
     # Document choices.
     numPeriods = str(obsEconomy.getAttr('numPeriods'))
     
     numAgents  = str(obsEconomy.getAttr('numAgents'))
     
-    with open('simEconomy.struct.info', 'w') as file_:
+    with open(file_ + '.infos.struct.out', 'w') as file_:
         
         file_.write('\n Simulated Economy\n\n')
         
@@ -222,19 +222,19 @@ def _writeInfo(obsEconomy, parasObj):
 if __name__ == '__main__':
         
     parser = argparse.ArgumentParser(description = 
-      'Simulation of economy for the structToolbox.')
+      'Simulation of an economy for the structToolbox.')
 
     parser.add_argument('--init', \
                         action  = 'store', \
                         dest    = 'init', \
                         default = 'init.ini', \
-                        help    = 'Configuration for simulation.')
+                        help    = 'specify initialization file')
     
     parser.add_argument('--update', \
                         action  = 'store_true', \
                         dest    = 'update', \
                         default = False, \
-                        help    = 'Update parameter class.')
+                        help    = 'update structural parameters')
 
 
     initFile, update = _distributeInput(parser)

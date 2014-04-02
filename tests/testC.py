@@ -29,7 +29,7 @@ class testCls(object):
     
     def test_case_1(self):
         
-        simulate(initFile = '../dat/testC.ini', dataFile = 'testC.pkl')
+        simulate(initFile = '../dat/testC.ini')
         
         ''' Process initialization file.
         '''

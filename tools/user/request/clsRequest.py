@@ -17,8 +17,10 @@ class requestCls(meta):
 
         self.attr['estimation']   = None        
 
-        self.attr['derived']      = None        
-        
+        self.attr['derived']      = None       
+
+        self.attr['init']         = None       
+
         # Status indicator.
         self.isLocked = False
         

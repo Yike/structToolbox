@@ -67,13 +67,13 @@ class testCls(object):
         
         
                     
-        simulate(initFile = '../dat/testF_parallel_function.ini', dataFile = 'obsEconomy.pkl')
+        simulate(initFile = '../dat/testF_parallel_function.ini')
 
         for file_ in ['testF_parallel_function.ini', 'testF_parallel_gradient.ini', \
                             'testF_parallel_function_accelerated.ini', \
                             'testF_parallel_gradient_accelerated.ini']:        
                     
-            estimate(initFile = '../dat/' + file_, dataFile = 'obsEconomy.pkl')
+            estimate(initFile = '../dat/' + file_)
             
             rslt = pkl.load(open('rslt.struct.pkl', 'r'))
    

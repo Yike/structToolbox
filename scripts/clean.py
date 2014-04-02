@@ -7,6 +7,40 @@ import os
 import glob
 import argparse
 
+''' Main function.
+'''
+def clean(resume = False):
+    ''' Cleanup after estimation run.
+    '''
+    # Potential files.
+    fileList = glob.glob('*.struct.*')
+        
+    # Ensure resume.
+    if(resume):
+        
+        try:      
+            
+            fileList.remove('stepParas.struct.out')
+        
+        except:
+            
+            pass
+    # Remove information from simulated data.
+    for file_ in ['*.infos.struct.out', '*.paras.struct.out']:
+                        
+        try:
+            
+            fileList.remove(glob.glob(file_)[0])
+            
+        except:
+            
+            pass
+        
+    # Remove files.
+    for file_ in fileList:
+            
+        os.remove(file_)
+         
 ''' Auxiliary functions.
 '''
 def _distributeInput(parser):
@@ -16,42 +50,28 @@ def _distributeInput(parser):
     args = parser.parse_args()
 
     # Distribute arguments.
-    isRestart = args.restart 
+    resume = args.resume 
 
     # Assertions.
-    assert (isRestart in [True, False])
+    assert (resume in [True, False])
     
     # Finishing.
-    return isRestart
+    return resume
 
-''' Process command line arguments.
+''' Execution of module as script.
 '''
-parser = argparse.ArgumentParser(description = 
-'Cleanup for structEstimator.')
-
-parser.add_argument('--restart', \
-                    action  = 'store_true', \
-                    dest    = 'restart', \
-                    default = False, \
-                    help    = 'Keep restart information.')
-
-isRestart = _distributeInput(parser)
+if __name__ == '__main__':
         
-# Potential files.
-fileList = glob.glob('*.struct.*')
+    parser = argparse.ArgumentParser(description = 
+        'Cleanup after an estimation run of the structToolbox.')
     
-# Ensure restart.
-if(isRestart):
+    parser.add_argument('--resume', \
+                        action  = 'store_true', \
+                        dest    = 'resume', \
+                        default = False, \
+                        help    = 'keep files required to resume estimation')
     
-    try:      
-        
-        fileList.remove('stepParas.struct.out')
+    resume = _distributeInput(parser)
     
-    except:
-        
-        pass
-# Remove files.
-for file_ in fileList:
-        
-    os.remove(file_)
-     
+    clean(resume = resume)
+    

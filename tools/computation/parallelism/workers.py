@@ -4,7 +4,7 @@
 import  cPickle as      pkl
 import  numpy   as      np
 
-from    mpi4py  import  MPI
+from   mpi4py  import  MPI
 import sys
 import os
 
@@ -15,6 +15,7 @@ from tools.economics.economy.clsEconomy             import economyCls
 from tools.optimization.criterions.mle.calculations import _scalarEvaluations
 
 import tools.computation.performance.performance    as     perf
+from tools.user.interface           import *
 
 import _auxiliary as aux
 
@@ -28,9 +29,37 @@ comm       = MPI.Comm.Get_parent()
 
 size, rank = comm.Get_size(), comm.Get_rank()
 
+''' Initialization file.
+'''
+initFile = None
+
+initFile = comm.bcast(initFile, root=0)
+
+
+initObj  = initCls()
+    
+initObj.read(initFile)
+    
+initObj.lock()
+
+
+initDict    = initObj.getAttr('initDict')
+
+estimation  = initDict['EST']
+
+file_       = estimation['file']
+
+strategy    = estimation['parallelization']
+
+''' Performance library.
+'''
+accelerated = estimation['accelerated']
+
+perf.initialize(accelerated)
+
 ''' Distribute attributes.
 '''
-obsEconomy = pkl.load(open('obsEconomy.pkl', 'r'))
+obsEconomy = pkl.load(open(file_ + '.pkl', 'r'))
 
 agentObjs  = obsEconomy.getAttr('agentObjs')
 
@@ -39,30 +68,6 @@ parasObj   = obsEconomy.getAttr('parasObj')
 numParas   = parasObj.getAttr('numParas')
 
 numFree    = parasObj.getAttr('numFree')
-
-
-    
-''' Strategy.
-'''
-cmd = np.array(0, dtype = 'int32')
-    
-comm.Bcast([cmd, MPI.INT], root = 0)    
-
-strategy = 'function'
-
-if(cmd == 1): strategy = 'gradient'
-
-''' Performance enhancements.
-'''
-cmd = np.array(0, dtype = 'int32')
-    
-comm.Bcast([cmd, MPI.INT], root = 0)    
-
-accelerated = False
-
-if(cmd == 1): accelerated = True
-
-perf.initialize(accelerated)
 
 
 ''' Set up small economy.

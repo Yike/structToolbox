@@ -26,18 +26,20 @@ def optimize(requestObj):
 
     obsEconomy   = requestObj.getAttr('obsEconomy')        
 
-    derived      = requestObj.getAttr('derived')             
-    
-    # Further information.
-    parallelization = estimation['parallelization']
-    
-    accelerated     = estimation['accelerated']
-    
-    isRestart       = estimation['restart']
-    
-    numProcs        = estimation['processors']
+    derived      = requestObj.getAttr('derived')    
 
-    static          = derived['static']
+    init         = requestObj.getAttr('init')
+    
+    # Further information.   
+    accelerated = estimation['accelerated']
+
+    strategy    = estimation['parallelization']
+        
+    isRestart   = estimation['restart']
+    
+    numProcs    = estimation['processors']
+
+    static      = derived['static']
     
     ''' Performance enhancements.
     '''
@@ -50,12 +52,12 @@ def optimize(requestObj):
     if(numProcs > 1):
         
         commObj = commCls()
-                
+        
+        commObj.setAttr('init', init)
+        
+        commObj.setAttr('strategy', strategy)
+                                
         commObj.setAttr('numProcs', numProcs)
-
-        commObj.setAttr('accelerated', accelerated)
-                
-        commObj.setAttr('strategy', parallelization)
         
         commObj.lock()
         

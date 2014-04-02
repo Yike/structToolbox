@@ -27,9 +27,9 @@ class testCls(object):
     
     def test_case_1(self):
                 
-        simulate(initFile = '../dat/testA.ini', dataFile = 'testA.pkl')
+        simulate(initFile = '../dat/testA.ini')
         
-        estimate(initFile = '../dat/testA.ini', dataFile = 'testA.pkl')
+        estimate(initFile = '../dat/testA.ini')
         
         rslt = pkl.load(open('rslt.struct.pkl', 'r'))
         
