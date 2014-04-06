@@ -17,3 +17,4 @@ Contact:
 
 info@policy-lab.org
 
+You can sign up for our mailing list [here](http://eepurl.com/RStEH).

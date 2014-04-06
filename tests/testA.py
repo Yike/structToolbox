@@ -3,6 +3,8 @@
 '''
 # standard library
 import numpy    as np
+np.seterr('ignore')
+
 import cPickle  as pkl
 
 import sys
