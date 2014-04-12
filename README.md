@@ -17,7 +17,7 @@ You can sign up for our mailing list [here](http://eepurl.com/RStEH).
 
 ====
 
-The **structToolbox** was originally developed for a guest lecture on the estimation of structural behavioral models in *Life Cycle Dynamics, Inequality and Mobility* by Prof. James Heckman at the University of Chicago Department of Economics. 
+The **structToolbox** was originally developed for a guest lecture on the estimation of structural behavioral models in the course *Life Cycle Dynamics, Inequality and Mobility* by Prof. James Heckman at the University of Chicago Department of Economics. 
 
 Additional class material is available [here](http://www.policy-lab.org/teaching/struct-toolbox).
 
