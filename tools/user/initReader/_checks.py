@@ -18,11 +18,17 @@ def _basics(initDict):
     ''' Check for basic syntax.
     '''
     
-    ''' Restart material exists.
+    
+    ''' Check observed outcomes.
     '''
-    isRestart = initDict['EST']['restart']
+    dict_ = initDict['OBSERVED']
 
-    if(isRestart): assert (os.path.exists('stepParas.struct.out') == True)
+    assert (dict_.keys() == ['wage', 'spouse', 'choice'])
+    
+    for key_ in ['wage', 'choice', 'spouse']:
+        
+        assert (isinstance(dict_[key_], list))
+        assert (dict_[key_][0] > 0) 
     
     ''' Experience present.
     '''
@@ -68,20 +74,6 @@ def _basics(initDict):
         
     if(not mpi4py): assert (initDict['EST']['processors'] ==  1) 
 
-    ''' Acceleration.
-    '''
-    fortran = True
-    
-    try:
-        
-        import tools.computation.f90.f90_main as fort 
-
-    except ImportError:
-        
-        fortran = False
-    
-    if(not fortran): assert (initDict['EST']['accelerated'] == False)
-    
     ''' Parallelization strategies.
     '''
     assert (initDict['EST']['parallelization'] in ['function', 'gradient'])

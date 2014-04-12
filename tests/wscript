@@ -3,6 +3,8 @@
 # standard library
 import os
 
+''' Main
+'''
 def build(bld):
 
     # Distribute options.
@@ -28,10 +30,3 @@ def build(bld):
     
     bld(features = 'run_py_script', source = 'testD.py', target = "",  version = 2)
     
-    bld.add_group()
-    
-    bld(features = 'run_py_script', source = 'testE.py', target = "",  version = 2)
-    
-    bld.add_group()
-    
-    bld(features = 'run_py_script', source = 'testF.py', target = "",  version = 2)

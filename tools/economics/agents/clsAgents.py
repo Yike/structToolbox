@@ -160,11 +160,14 @@ class agentCls(meta):
         parasObj = self.attr['parasObj']
 
         # Auxiliary objects.
-        name     = node.getAttr('name')
+        name = node.getAttr('name')
+        
+        t    = len(name) - 2
 
-        spouse   = self.attr['attr']['spouse']
+        # Attributes.
+        spouse   = self.attr['attr']['spouse'][t]
             
-        children = self.attr['attr']['children']
+        children = self.attr['attr']['children'][t]
                  
         # Initialize containers.
         self.attr['w']['exAnte'][name] = perf.nan
@@ -177,7 +180,7 @@ class agentCls(meta):
             subsidy = parasObj.getParameters('subsidy')
             
             # Process wage.
-            attr         = self.getAttr('attr')['wage']
+            attr         = self.getAttr('attr')['wage'][t]
             
             coeffs, int_ = parasObj.getParameters('wage')
             
@@ -198,15 +201,13 @@ class agentCls(meta):
         else:
             
             # Process utilities.
-            attr         = self.attr['attr']['utility']
+            attr         = self.attr['attr']['utility'][t]
                     
             coeffs, int_ = parasObj.getParameters('utility')
             
             idxUtility   = perf.dot(attr, coeffs.T) + int_ 
 
             # Pleasure of children.
-            attr       = self.attr['attr']['children']
-                            
             coeffs     = parasObj.getParameters('child')
                     
             idxUtility = idxUtility + perf.dot(children, coeffs) 
@@ -400,9 +401,11 @@ class agentCls(meta):
         assert (self.getStatus() == True)
         
         # Distribute class attributes.
+        steps    = self.attr['steps']
+        
         parasObj = self.attr['parasObj']
 
-        attr     = self.attr['attr']['wage']
+        attr     = self.attr['attr']['wage'][steps]
         
         exp      = self.attr['attr']['experience'][-1]
         

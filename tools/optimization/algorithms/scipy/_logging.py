@@ -93,6 +93,8 @@ def _writeOptimizationHeader(scipyObj):
     assert (scipyObj.getStatus() == True)
     
     # Distribute class attributes.
+    numAgents = str(scipyObj.attr['numAgents'])
+
     algorithm = scipyObj.attr['optimization']['optimizer']
         
     optsDict  = scipyObj.attr['optsDict']
@@ -112,9 +114,11 @@ def _writeOptimizationHeader(scipyObj):
                 
     file_.write('\n Optimization \n ------------ \n\n')
             
-    file_.write(' Toolbox:   SciPy' + '\n' )
+    file_.write(' Toolbox:     SciPy' + '\n' )
 
-    file_.write(' Algorithm: ' + algorithm + '\n\n')
+    file_.write(' Algorithm:   ' + algorithm + '\n\n')
+        
+    file_.write(' Agent Count: ' + numAgents + '\n\n')
         
     if(algorithm == 'POWELL'):
             

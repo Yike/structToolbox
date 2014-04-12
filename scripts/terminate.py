@@ -14,7 +14,8 @@ import numpy as np
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description = 
-      'Terminate estimation run.')
+      'Terminate estimation run of structToolbox.', 
+      formatter_class = argparse.ArgumentDefaultsHelpFormatter)
 
     args = parser.parse_args()
  

@@ -43,6 +43,27 @@ class economyCls(meta):
         # Status indicator.
         self.isLocked = False
 
+    ''' Public Methods.
+    '''
+    def subset(self, numSubset):
+        ''' Select a subset of agents only.
+        '''
+        # Antibugging. 
+        assert (isinstance(numSubset, int))
+        assert (0 < numSubset <= self.attr['numAgents'])
+        
+        # Check applicability.
+        if(numSubset is None): return
+            
+        if(self.attr['numAgents'] == numSubset): return 
+        
+        # Select subset of agents.
+        self.unlock()
+        
+        self.attr['agentObjs'] = self.attr['agentObjs'][:numSubset]
+        
+        self.lock()
+        
     def simulate(self):
         ''' Simulate economy.
         '''
@@ -64,7 +85,6 @@ class economyCls(meta):
     def _derivedAttributes(self):
         ''' Construct derived attributes.
         '''
-        
         # Distribute attributes.
         agentObjs = self.attr['agentObjs']
         
@@ -73,37 +93,49 @@ class economyCls(meta):
         
         self.attr['numAgents']  = len(agentObjs)
         
+        # Distribute class attributes.
+        numPeriods = self.attr['numPeriods']
+        
         # Exogenous characteristics.
         labels = ['children', 'wage', 'utility', 'spouse', 'experience']
         
         for label in labels:
+        
+            self.attr['attr'][label] = {}
             
-            attr = []
-            
-            for agentObj in agentObjs:
+            for t in range(numPeriods):
+
+                attr = []
                 
-                attr.append(agentObj.attr['attr'][label])
-            
-            # Type conversion.
-            attr = np.array(attr, ndmin = 2)
-            
-            if(label in ['children', 'spouse']): attr = attr.T
-            
-            self.attr['attr'][label] =  attr
-            
+                for agentObj in agentObjs:
+                    
+                    attr.append(agentObj.attr['attr'][label][t])
+                
+                # Type conversion.
+                attr = np.array(attr, ndmin = 2)
+                
+                if(label not in ['wage', 'utility']):
+                    
+                    attr = attr.T
+
+                self.attr['attr'][label][t] =  attr
+        
         # Endogenous characteristics.
         labels = ['wages', 'choices']
     
         for label in labels:
+
+            self.attr[label] = {}
             
-            attr = []
-            
-            for agentObj in agentObjs:
+            for t in range(numPeriods):
                 
-                attr.append(agentObj.attr[label])
-           
-            # Type conversion.
-            attr = np.array(attr, ndmin = 2)
-                        
-            self.attr[label] =  attr 
+                attr = []
             
+                for agentObj in agentObjs:
+                    
+                    attr.append(agentObj.attr[label][t])
+           
+                # Type conversion.
+                attr = np.array(attr, ndmin = 2).T
+                            
+                self.attr[label][t] = attr 

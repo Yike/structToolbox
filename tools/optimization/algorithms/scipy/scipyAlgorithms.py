@@ -44,6 +44,8 @@ class scipyCls(meta):
                         
                         
         # Derived attributes.        
+        self.attr['numAgents'] = None
+        
         self.attr['rslt'] = None
                 
         # Logging.
@@ -83,7 +85,7 @@ class scipyCls(meta):
         
         # Special treatment for single evaluation.
         if(maxiter == 0):
-            
+
             rslt = {}
             
             rslt['x']       = startVals
@@ -195,11 +197,13 @@ class scipyCls(meta):
         assert (self.getStatus() == True)
         
         # Distribute class attributes.
-        startVals = self.attr['startVals']
+        startVals  = self.attr['startVals']
         
-        optsDict  = self.attr['optsDict']
+        optsDict   = self.attr['optsDict']
         
-        optimizer = self.attr['optimization']['optimizer']
+        optimizer  = self.attr['optimization']['optimizer']
+        
+        obsEconomy = self.attr['obsEconomy']
         
         # Collect derived attributes.
         self.attr['numFree'] = len(startVals)
@@ -207,6 +211,8 @@ class scipyCls(meta):
         if(optimizer in ['SCIPY-BFGS']):
             
             self.attr['epsilon'] = optsDict['SCIPY-BFGS']['epsilon']
+        
+        self.attr['numAgents'] = obsEconomy.getAttr('numAgents')
         
     def _gradientFunction(self, x):
         ''' Gradient function.

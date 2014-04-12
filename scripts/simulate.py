@@ -2,7 +2,8 @@
 ''' Simulation script.
 '''
 # standard library
-import numpy as np
+import numpy  as np
+import pandas as pd
 
 import argparse
 import sys
@@ -15,9 +16,11 @@ sys.path.insert(0, dir_)
 # project library
 import tools.computation.performance.performance as perf
 
-from tools.user.interface        import *
+from tools.optimization.criterions.mle.calculations import sampleLikelihood
 
-from tools.economics.interface   import *
+from tools.user.interface                           import *
+
+from tools.economics.interface                      import *
 
 def simulate(initFile = 'init.ini', update = False):
     ''' Simulation of agent population.
@@ -34,24 +37,18 @@ def simulate(initFile = 'init.ini', update = False):
     
     initObj.lock()
     
-    ''' Performance enhancements.
-    '''
-    perf.initialize(False)
-    
     ''' Distribute information.
     '''
     initDict = initObj.getAttr('initDict')
     
     
-    numPeriods = initDict['BASICS']['periods']
+    numPeriods = initDict['SIM']['periods']
     
     numAgents  = initDict['SIM']['agents']
     
     seed       = initDict['SIM']['seed']
     
     file_      = initDict['SIM']['file']
-    
-    income     = initDict['SPOUSE']['income']
     
     allPos     = initDict['DERIV']['pos']
     
@@ -72,53 +69,64 @@ def simulate(initFile = 'init.ini', update = False):
     np.random.seed(seed)
     
     agentObjs = []
-    
+   
     for _ in range(numAgents):
         
         ''' Construct attributes.
         '''
         values, attr = {}, {}
-        
-        for i in allPos:
+   
+        for t in range(numPeriods):
             
-            values[i] = np.random.rand()
-        
-        # Special treatments.
-        pos = initDict['UTILITY']['child']['pos']
-        
-        values[pos[0]] = np.random.randint(low = 0, high = 10)
+            values[t] = {}
+            
+            for i in allPos:
                 
+                values[t][i] = np.random.rand()
+        
         # Spouse.
-        attr['spouse'] = income
+        attr['spouse'] = _constructSpouse(numPeriods)
 
+        # Children.
+        pos = initDict['UTILITY']['child']['pos']
+    
+        attr['children'] = _constructChildren(numPeriods)
+        
         # Experience.
         pos = initDict['WAGE']['exper']['pos']
     
         attr['experience'] = [0.0]
                     
-        # Children.
-        pos = initDict['UTILITY']['child']['pos']
-    
-        attr['children'] = values[pos[0]]
-        
         # Utility.
         attr['utility'] = []
     
         list_ = initDict['UTILITY']['coeffs']['pos']
         
-        for pos in list_:
+        for t in range(numPeriods):
         
-            attr['utility'] = attr['utility'] + [values[pos]]
+            cand =  []
+
+            for pos in list_:
+                
+                cand = cand + [values[t][pos]]
+            
+            attr['utility'] = attr['utility'] + [cand]    
         
         # Wage.
         attr['wage'] = []
         
         list_ = initDict['WAGE']['coeffs']['pos']
         
-        for pos in list_:
+        for t in range(numPeriods):
         
-            attr['wage'] = attr['wage'] + [values[pos]]
-             
+            cand =  []
+
+            for pos in list_:
+                
+                cand = cand + [values[t][pos]]
+            
+            attr['wage'] = attr['wage'] + [cand]    
+
              
         agentObj = agentCls()
                 
@@ -151,12 +159,14 @@ def simulate(initFile = 'init.ini', update = False):
         
         economyObj.simulate()
     
+    
     ''' Store.
     '''
     economyObj.store(file_ + '.pkl')
     
     _writeInfo(economyObj, parasObj, file_)
 
+    _writeData(economyObj, initDict, file_)
         
 ''' Auxiliary functions.
 '''
@@ -179,6 +189,158 @@ def _distributeInput(parser):
     # Finishing.
     return initFile, update
 
+def _constructSpouse(numPeriods):
+    ''' Construct a history of spouse income.
+    '''
+    # Initialize auxiliary objects.
+    list_ = []
+    
+    # Time path.
+    for _ in range(numPeriods):
+ 
+        spouse = np.random.sample()
+        
+        list_ += [spouse]
+        
+    # Finishing.
+    return list_
+
+def _constructChildren(numPeriods):
+    ''' Construct a child history.
+    '''
+    # Initialize auxiliary objects.
+    list_ = []
+    
+    # Initial endowment.
+    int_ = np.random.randint(0, 10)
+    
+    # Time path.
+    list_ += [int_]
+    
+    for _ in range(1, numPeriods):
+        
+        leav = np.random.randint(0, 1)
+        
+        cand = list_[-1] - leav
+        
+        cand = max(0, cand)
+        
+        list_ += [cand]
+        
+    # Finishing.
+    return list_
+    
+def _writeData(obsEconomy, initDict, file_):
+    ''' Write out simulated economy to a text file.
+    '''    
+    # Distribute class attributes.
+    numAgents  = obsEconomy.getAttr('numAgents')
+    
+    numPeriods = obsEconomy.getAttr('numPeriods')
+    
+    agentObjs  = obsEconomy.getAttr('agentObjs')
+    
+    # Auxiliary objects.
+    max_ = np.max(initDict['DERIV']['pos']) 
+    
+    data = np.tile(np.nan, (numAgents*numPeriods, (max_ + 1)))
+
+    # Fill array.
+    count = 0
+    
+    for agentObj in agentObjs:
+        
+        for t in range(numPeriods):
+            
+            # Time periods.
+            data[count, 0] = t + 1
+            
+            # Observed outcomes.
+            for key_ in ['wage', 'choice']:
+                
+                pos = initDict['OBSERVED'][key_]
+                
+                data[count, pos] = agentObj.attr[key_ + 's'][t]
+            
+            # Deal with spouse income.
+            list_ = initDict['OBSERVED']['spouse']
+            
+            data[count, list_] = agentObj.attr['attr']['spouse'][t]
+
+            # Deal with children.            
+            pos = initDict['UTILITY']['child']['pos']
+            
+            data[count, pos] = agentObj.attr['attr']['children'][t]
+            
+            # Deal with utility shifters
+            list_ = initDict['UTILITY']['coeffs']['pos']
+                    
+            data[count, list_] = agentObj.attr['attr']['utility'][t]
+            
+            
+            # Deal with wage shifters
+            list_ = initDict['WAGE']['coeffs']['pos']
+                    
+            data[count, list_] = agentObj.attr['attr']['wage'][t]
+            
+                            
+            pos = initDict['WAGE']['exper']['pos']
+           
+            data[count, pos] = agentObj.attr['attr']['experience'][t]
+            
+            
+            count = count + 1
+    
+    # Write out.
+    df   = pd.DataFrame(data)
+
+    pos  = initDict['DERIV']['pos']   
+    
+    
+    ints = [0]
+    
+    ints = ints + initDict['WAGE']['exper']['pos']
+    
+    ints = ints + initDict['UTILITY']['child']['pos']
+    
+    ints = ints + initDict['OBSERVED']['choice']
+    
+    
+    formats = {}
+    
+    for idx in range(max(pos)):
+        
+        formats[idx] = _formatFloat
+        
+        if(idx in ints): formats[idx] = _formatInteger
+        
+        
+    with open(file_ + '.txt', 'wb') as file_:
+        
+        df.to_string(file_, index = False, header = None, na_rep = '.', formatters=formats)
+
+def _formatFloat(x):
+    ''' Format floating point number.
+    '''
+    if pd.isnull(x):
+    
+        return '    .'
+    
+    else:
+        
+        return "%15.8f" % x
+        
+def _formatInteger(x):
+    ''' Format integers.
+    '''
+    if pd.isnull(x):
+    
+        return '    .'
+    
+    else:
+        
+        return "%5d" % x
+            
 def _writeInfo(obsEconomy, parasObj, file_):
     ''' Write some info about the simulated economy to a text file.
     '''
@@ -193,27 +355,32 @@ def _writeInfo(obsEconomy, parasObj, file_):
     
     numAgents  = str(obsEconomy.getAttr('numAgents'))
     
+    fval       = str(sampleLikelihood(obsEconomy, parasObj, False))
+    
+    
     with open(file_ + '.infos.struct.out', 'w') as file_:
         
         file_.write('\n Simulated Economy\n\n')
         
         file_.write('   Number of Observations: ' + numAgents + '\n\n')
 
-        file_.write('   Number of Periods:      ' + numPeriods + '\n\n\n')  
-    
+        file_.write('   Number of Periods:      ' + numPeriods + '\n\n')  
+
+        file_.write('   Function Value:         ' + fval + '\n\n\n')  
+            
         file_.write('   Choices:  \n\n') 
 
         file_.write('       Period     Working      Home      \n\n')
         
-        for i in range(obsEconomy.getAttr('numPeriods')):
+        for t in range(obsEconomy.getAttr('numPeriods')):
             
-            working = str(np.sum(obsEconomy.getAttr('choices')[:,i] == 1))
+            working = str(np.sum(obsEconomy.getAttr('choices')[t] == 1))
 
-            home    = str(np.sum(obsEconomy.getAttr('choices')[:,i] == 0))
+            home    = str(np.sum(obsEconomy.getAttr('choices')[t] == 0))
             
             string  = '''{0[0]:>10} {0[1]:>12} {0[2]:>10}\n'''
             
-            file_.write(string.format([i, working, home]))
+            file_.write(string.format([(t + 1), working, home]))
         
         file_.write('\n\n')
         
@@ -222,7 +389,8 @@ def _writeInfo(obsEconomy, parasObj, file_):
 if __name__ == '__main__':
         
     parser = argparse.ArgumentParser(description = 
-      'Simulation of an economy for the structToolbox.')
+        'Simulation of an economy for the structToolbox.', 
+        formatter_class = argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('--init', \
                         action  = 'store', \

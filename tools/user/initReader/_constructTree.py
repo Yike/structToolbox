@@ -8,7 +8,7 @@ def _constructTree(initDict):
     ''' Construct tree from model.cfg.
     '''
     # Distribute information.
-    numPeriods = initDict['BASICS']['periods']
+    numPeriods = initDict['SIM']['periods']
     
     # Algorithm.
     treeObj = treeCls()

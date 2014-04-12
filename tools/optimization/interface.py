@@ -1,7 +1,5 @@
 ''' Interface to optimization algorithms.
 '''
-# standard library
-import numpy as np
 
 # project library
 from tools.optimization.algorithms.clsAlgorithms    import algoCls
@@ -31,19 +29,11 @@ def optimize(requestObj):
     init         = requestObj.getAttr('init')
     
     # Further information.   
-    accelerated = estimation['accelerated']
-
     strategy    = estimation['parallelization']
-        
-    isRestart   = estimation['restart']
     
     numProcs    = estimation['processors']
 
     static      = derived['static']
-    
-    ''' Performance enhancements.
-    '''
-    perf.initialize(accelerated)
         
     ''' Parallelism
     '''
@@ -65,16 +55,8 @@ def optimize(requestObj):
     
     ''' Get starting values.
     '''
-    parasObj = requestObj.getAttr('parasObj')
-    
-    
-    if(isRestart):
-        
-        x = np.genfromtxt('stepParas.struct.out')
-        
-        parasObj.update(x, 'internal', 'all')
-        
-    
+    parasObj  = requestObj.getAttr('parasObj')
+
     startVals = parasObj.getValues('external', 'free')
     
     

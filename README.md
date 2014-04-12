@@ -9,12 +9,15 @@ Online Documentation (under construction):
 
 http://www.policy-lab.org/structToolbox
 
-Project Homepage:
-
-http://www.policy-lab.org/teaching/struct-toolbox
-
 Contact:
 
 info@policy-lab.org
 
 You can sign up for our mailing list [here](http://eepurl.com/RStEH).
+
+====
+
+The **structToolbox** was originally developed for a guest lecture on the estimation of structural behavioral models in *ECON350: Life Cycle Dynamics, Inequality and Mobility* by Prof. James Heckman at the University of Chicago Department of Economics. 
+
+Additional class material is available [here](http://www.policy-lab.org/teaching/struct-toolbox).
+

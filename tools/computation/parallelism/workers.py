@@ -19,10 +19,6 @@ from tools.user.interface           import *
 
 import _auxiliary as aux
 
-''' Auxiliary functions.
-'''
-
-
 ''' Communicators.
 '''
 comm       = MPI.Comm.Get_parent()
@@ -51,11 +47,6 @@ file_       = estimation['file']
 
 strategy    = estimation['parallelization']
 
-''' Performance library.
-'''
-accelerated = estimation['accelerated']
-
-perf.initialize(accelerated)
 
 ''' Distribute attributes.
 '''

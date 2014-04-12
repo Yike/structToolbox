@@ -12,9 +12,10 @@ import tools.computation.performance.performance    as perf
 def sampleLikelihood(obsEconomy, parasObj, static):
     ''' Function calculates the sample likelihood.
     '''
+    
     # Select implementation
     if(static): 
-        
+                
         likl = _staticCalculation(obsEconomy, parasObj)
     
     else:
@@ -34,80 +35,88 @@ def _staticCalculation(obsEconomy, parasObj):
     ''' Calculation of sample likelihood.
     '''
     # Distribute class attributes
-    numAgents = obsEconomy.getAttr('numAgents')
-    
-    attr      = obsEconomy.getAttr('attr')
-    
-    wages     = obsEconomy.getAttr('wages') 
+    numPeriods = obsEconomy.getAttr('numPeriods')
 
-    choices   = obsEconomy.getAttr('choices')
-
-    # Experience 
-    coeffs        = parasObj.getParameters('experience')
-                    
-    z             = attr['experience']
-
-    idxExperience = np.dot(z, coeffs.T) 
-        
-    # Wage 
-    coeffs, int_ = parasObj.getParameters('wage')
-                    
-    z            = attr['wage']
-
-    idxWage      = np.dot(z, coeffs.T) + int_ + idxExperience
-        
-    # Utility 
-    coeffs, int_ = parasObj.getParameters('utility')
-                    
-    z            = attr['utility']
-                    
-    idxUtility   = np.dot(z, coeffs.T) + int_
+    numAgents  = obsEconomy.getAttr('numAgents')
     
-    # Children 
-    coeff   = parasObj.getParameters('child')
-                    
-    cost    = parasObj.getParameters('cost')
-                    
-    subsidy = parasObj.getParameters('subsidy') 
-                    
-                    
-    n            = attr['children']
-                    
-    idxChild     = np.dot(n, (cost - subsidy) + coeff.T)
+    attr       = obsEconomy.getAttr('attr')
+
+    # Auxiliary objects.
+    contrib = []
+
+    # Loop over periods.    
+    for t in range(numPeriods):
         
-    # Latent variable index
-    xiStar = idxWage - idxChild - idxUtility
+        # Experiences.
+        wages     = obsEconomy.getAttr('wages')[t] 
     
-    # Home.
-    xi   = parasObj.getParameters('xi')
-                                            
-    home = norm.cdf(-xiStar, xi['mean'], xi['sd'])
+        choices   = obsEconomy.getAttr('choices')[t]
         
-    # Working.
-    eta  = parasObj.getParameters('eta')
+        # Experience 
+        coeffs        = parasObj.getParameters('experience')
                         
-    # Working (unconditional)  
-    real = wages - idxWage
-    
-    unconditional = norm.pdf(real, eta['mean'], eta['sd'])      
-    
-    conditional = 1.0 - cdfConditional_multiple(-xiStar, xi, eta, real) 
-
-    working     = conditional*unconditional
-    
-    working[np.isnan(working)] = 0.0
-    
-    # Aggregation.
-    prob = choices*working + (1.0 - choices)*home
+        z             = attr['experience'][t]
         
-    prob = np.clip(prob, 1e-20, np.inf)
+        idxExperience = np.dot(z, coeffs.T) 
+                
+        # Wage 
+        coeffs, int_ = parasObj.getParameters('wage')
                         
-    prob = -np.log(prob)
+        z            = attr['wage'][t]
+        
+        idxWage      = np.dot(z, coeffs.T)  + int_ + idxExperience
+                    
+        # Utility 
+        coeffs, int_ = parasObj.getParameters('utility')
+                        
+        z            = attr['utility'][t]
+                        
+        idxUtility   = np.dot(z, coeffs.T)  + int_
+        
+        # Children 
+        coeff    = parasObj.getParameters('child')
+                        
+        cost     = parasObj.getParameters('cost')
+                        
+        subsidy  = parasObj.getParameters('subsidy') 
+                        
+        n        = attr['children'][t]
+                        
+        idxChild = np.dot(n, (cost - subsidy) + coeff.T)
+                
+        # Latent variable index
+        xiStar = idxWage - idxChild - idxUtility
+        
+        # Home.
+        xi   = parasObj.getParameters('xi')
+                                                
+        home = norm.cdf(-xiStar, xi['mean'], xi['sd'])
+            
+        # Working.
+        eta  = parasObj.getParameters('eta')
+                            
+        # Working (unconditional)  
+        real          = wages - idxWage
+        
+        unconditional = norm.pdf(real, eta['mean'], eta['sd'])      
+        
+        conditional   = 1.0 - cdfConditional_multiple(-xiStar, xi, eta, real) 
     
-    likl = np.sum(prob)
+        working       = conditional*unconditional
+        
+        working[np.isnan(working)] = 0.0
+ 
+        # Aggregation.
+        contrib += [choices*working + (1.0 - choices)*home]
+       
+    # Collect across periods.
+    contrib = np.clip(contrib, 1e-20, np.inf)
+            
+    likl    = -np.log(contrib)
     
-    # Scaling.
-    likl = (1.0/float(numAgents))*likl
+    likl    = np.sum(likl)
+    
+    likl    = (1.0/float(numAgents))*likl
     
     # Finishing
     return likl
@@ -139,7 +148,7 @@ def _scalarEvaluations(obsEconomy, parasObj):
             
             # Calculate likelihood.
             prob = _individualLikelihood(agentObj, parasObj, period)
-                                               
+                                              
             # Collect results.
             likl = likl + prob
     

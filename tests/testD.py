@@ -33,7 +33,7 @@ class testCls(object):
          
         rslt = pkl.load(open('rslt.struct.pkl', 'r'))
 
-        assert_true(np.allclose(rslt['fun'], -0.58179596977255987) == True)
+        assert_true(np.allclose(rslt['fun'], -0.806668828669) == True)
 
 ''' Execution of module as script.
 '''

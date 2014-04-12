@@ -57,6 +57,14 @@ def estimate(initFile = 'init.ini', resume = False):
     '''
     obsEconomy = pkl.load(open(file_ + '.pkl', 'r'))
     
+    
+    ''' Subset.
+    '''
+    numSubset = estimation['agents']
+   
+    obsEconomy.subset(numSubset)
+    
+    
     ''' Update.
     '''
     if(resume):
@@ -141,7 +149,8 @@ def fork():
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description = 
-      'Start of estimation run of the structToolbox.')
+        'Start of estimation run of the structToolbox.', 
+        formatter_class = argparse.ArgumentDefaultsHelpFormatter)
     
     parser.add_argument('--init', \
                         action  = 'store', \

@@ -69,7 +69,13 @@ def build(bld):
         bld.add_group() 
     
         bld.recurse('tests')
-
+    
+    bld.add_group() 
+    
+    bld(rule = cleanup)
+    
+    bld.add_group() 
+    
 def distclean(ctx):
     
     remove_filetypes_distclean('.')
@@ -84,6 +90,26 @@ def distclean(ctx):
     
 ''' Auxiliary functions.
 '''
+def cleanup(bld):
+    
+    os.chdir(bld.env.project_paths['STRUCT_TOOLBOX'])
+    
+    files = glob.glob('tests/*.txt')
+    
+    files = files + glob.glob('tests/*.struct.*')
+
+    files = files + glob.glob('tests/*.pkl')    
+    
+    for file_ in files:
+
+        try:
+            
+            os.remove(file_)
+    
+        except OSError:
+            
+            pass
+    
 def set_permissions():
     ''' Set permissions.
     '''
@@ -110,16 +136,14 @@ def remove_for_distclean(path):
 
 def remove_filetypes_distclean(path):
     ''' Remove nuisance files from the directory tree.
-
     '''
-
     matches = []
 
     for root, _, filenames in os.walk('.'):
 
         for filetypes in ['*.aux','*.log','*.pyc', '*.so', '*~', '*tar', \
             '*.zip', '.waf*', '*lock*', '*.mod', '*.a', '*.pkl', '*.out', '*.pyo', '*.info',\
-            '.pid']:
+            '.pid', '*.struct.*']:
 
                 for filename in fnmatch.filter(filenames, filetypes):
                     
@@ -138,7 +162,6 @@ def set_project_paths(ctx):
         required such that the run_py_script works as the whole PROJECT_ROOT is
         added to the Python path during execution.
     ''' 
-
     pp = {}
 
     pp['PROJECT_ROOT'] = '.'

@@ -89,7 +89,8 @@ def process(args):
 if __name__ == '__main__':
     
     parser  = argparse.ArgumentParser(description = \
-                'Perturb current value of structural parameters.')
+        'Perturb current value of structural parameters for structToolbox.', 
+        formatter_class = argparse.ArgumentDefaultsHelpFormatter)
         
     parser.add_argument('--seed', \
                         type    = int , \

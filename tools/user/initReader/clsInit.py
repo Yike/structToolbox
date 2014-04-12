@@ -24,7 +24,7 @@ class initCls(meta):
     
     ''' Public Methods.
     '''
-    def read(self, configFile = 'init.ini'):
+    def read(self, configFile='init.ini'):
         ''' Read initialization file.
         '''
         # Initialize dictionary.        
@@ -53,11 +53,11 @@ class initCls(meta):
 
                 ''' Process major blocks.
                 '''
-                if(keyword ==  'SPOUSE'):
+                if(keyword == 'OBSERVED'):
                         
-                    initDict = self._processSPOUSE(initDict, currentLine) 
+                    initDict = self._processOBSERVED(initDict, currentLine)
         
-                if(keyword ==  'BASICS'):
+                if(keyword == 'BASICS'):
                         
                     initDict = self._processBASICS(initDict, currentLine)        
         
@@ -65,23 +65,23 @@ class initCls(meta):
 
                     initDict = self._processSHOCKS(initDict, currentLine)        
 
-                if(keyword ==  'UTILITY'):
+                if(keyword == 'UTILITY'):
                         
                     initDict = self._processUTILITY(initDict, currentLine)  
 
-                if(keyword ==  'WAGE'):
+                if(keyword == 'WAGE'):
                         
                     initDict = self._processWAGE(initDict, currentLine)  
                     
-                if(keyword ==  'OPTIMIZATION'):
+                if(keyword == 'OPTIMIZATION'):
                         
                     initDict = self._processOPT(initDict, currentLine)        
 
-                if(keyword ==  'ESTIMATION'):
+                if(keyword == 'ESTIMATION'):
                         
                     initDict = self._processEST(initDict, currentLine)  
 
-                if(keyword ==  'SIMULATION'):
+                if(keyword == 'SIMULATION'):
                         
                     initDict = self._processSIM(initDict, currentLine)  
  
@@ -91,12 +91,12 @@ class initCls(meta):
         
         parasObj = aux._constructParas(initDict)
 
-        treeObj  = aux._constructTree(initDict)
+        treeObj = aux._constructTree(initDict)
                 
                 
         initDict['PARAS'] = parasObj
 
-        initDict['TREE']  = treeObj
+        initDict['TREE'] = treeObj
  
         # Checks.
         aux._checks(initDict)
@@ -118,12 +118,12 @@ class initCls(meta):
                 
                 initDict[key_]['int']['value'] = [0.00]
     
-                initDict[key_]['int']['free']  = [False]            
+                initDict[key_]['int']['free'] = [False]            
         
         # Finishing.
         return initDict
     
-    def _additionATTR(self,initDict):
+    def _additionATTR(self, initDict):
         ''' Process additional arguments.
         '''
         
@@ -137,15 +137,21 @@ class initCls(meta):
         pos = pos + initDict['WAGE']['coeffs']['pos']
         
         pos = pos + initDict['WAGE']['exper']['pos']
-                
+
+        pos = pos + initDict['OBSERVED']['wage']
+        
+        pos = pos + initDict['OBSERVED']['choice']
+        
+        pos = pos + initDict['OBSERVED']['spouse']
+        
         pos = list(set(pos))
         
 
-        initDict['DERIV']['pos']     = pos
+        initDict['DERIV']['pos'] = pos
         
         initDict['DERIV']['numAttr'] = len(pos)
         
-        initDict['DERIV']['static']  = (initDict['BASICS']['discount'] == 0.0)
+        initDict['DERIV']['static'] = (initDict['BASICS']['discount'] == 0.0)
         
         # Finishing.
         return initDict
@@ -163,27 +169,27 @@ class initCls(meta):
         # Construct dictionary.   
         if(keyword in ['coeff']):
             
-            pos   = int(currentLine[1])
+            pos = int(currentLine[1])
             
             value, isFree = aux._processLine(currentLine[2])
             
-            initDict['WAGE']['coeffs']['pos']   += [pos] 
+            initDict['WAGE']['coeffs']['pos'] += [pos] 
  
             initDict['WAGE']['coeffs']['value'] += [value] 
             
-            initDict['WAGE']['coeffs']['free']  += [isFree] 
+            initDict['WAGE']['coeffs']['free'] += [isFree] 
             
         if(keyword in ['exper']):
             
-            pos   = int(currentLine[1])
+            pos = int(currentLine[1])
             
             value, isFree = aux._processLine(currentLine[2])
             
-            initDict['WAGE']['exper']['pos']   += [pos] 
+            initDict['WAGE']['exper']['pos'] += [pos] 
  
             initDict['WAGE']['exper']['value'] += [value] 
             
-            initDict['WAGE']['exper']['free']  += [isFree] 
+            initDict['WAGE']['exper']['free'] += [isFree] 
                     
         if(keyword in ['int']):
             
@@ -191,7 +197,7 @@ class initCls(meta):
  
             initDict['WAGE']['int']['value'] += [value] 
 
-            initDict['WAGE']['int']['free']  += [isFree] 
+            initDict['WAGE']['int']['free'] += [isFree] 
                      
         # Finishing.
         return initDict
@@ -209,15 +215,15 @@ class initCls(meta):
         # Construct dictionary.   
         if(keyword in ['coeff']):
             
-            pos   = int(currentLine[1])
+            pos = int(currentLine[1])
             
             value, isFree = aux._processLine(currentLine[2])
             
-            initDict['UTILITY']['coeffs']['pos']   += [pos] 
+            initDict['UTILITY']['coeffs']['pos'] += [pos] 
  
             initDict['UTILITY']['coeffs']['value'] += [value] 
 
-            initDict['UTILITY']['coeffs']['free']  += [isFree] 
+            initDict['UTILITY']['coeffs']['free'] += [isFree] 
                     
         if(keyword in ['int']):
             
@@ -225,19 +231,19 @@ class initCls(meta):
  
             initDict['UTILITY']['int']['value'] += [value] 
 
-            initDict['UTILITY']['int']['free']  += [isFree] 
+            initDict['UTILITY']['int']['free'] += [isFree] 
 
         if(keyword in ['child']):
             
-            pos   = int(currentLine[1])
+            pos = int(currentLine[1])
             
             value, isFree = aux._processLine(currentLine[2])
             
-            initDict['UTILITY']['child']['pos']   += [pos] 
+            initDict['UTILITY']['child']['pos'] += [pos] 
  
             initDict['UTILITY']['child']['value'] += [value] 
 
-            initDict['UTILITY']['child']['free']  += [isFree]             
+            initDict['UTILITY']['child']['free'] += [isFree]             
         # Finishing.
         return initDict
     
@@ -260,7 +266,7 @@ class initCls(meta):
             
             initDict['SHOCKS'][subtype]['value'] = value
 
-            initDict['SHOCKS'][subtype]['free']  = isFree
+            initDict['SHOCKS'][subtype]['free'] = isFree
         
         if(keyword == 'rho'):
             
@@ -268,11 +274,32 @@ class initCls(meta):
             
             initDict['SHOCKS']['rho']['value'] = value
         
-            initDict['SHOCKS']['rho']['free']  = isFree
+            initDict['SHOCKS']['rho']['free'] = isFree
         
         # Finishing.
         return initDict
-    
+
+    def _processOBSERVED(self, initDict, currentLine):
+        ''' Process position of observed variables.
+        '''
+        # Antibugging.
+        assert (isinstance(initDict, dict))
+        assert (isinstance(currentLine, list))
+        assert (len(currentLine) == 2)
+        
+        # Process information.    
+        keyword = currentLine[0]
+        flag = currentLine[1]
+        
+        # Type conversion.
+        flag = int(flag)
+            
+        # Construct dictionary.        
+        initDict['OBSERVED'][keyword] = [flag]
+        
+        # Finishing.
+        return initDict
+        
     def _processSIM(self, initDict, currentLine):
         ''' Process optimization details.
         '''
@@ -283,7 +310,7 @@ class initCls(meta):
         
         # Process information.    
         keyword = currentLine[0]
-        flag    = currentLine[1]
+        flag = currentLine[1]
         
         # Type conversion.
         if(keyword in ['file']):
@@ -293,7 +320,7 @@ class initCls(meta):
         else:
             
             flag = int(flag)
-            
+
         # Construct dictionary.        
         initDict['SIM'][keyword] = flag
         
@@ -311,20 +338,20 @@ class initCls(meta):
         # Process information.    
         keyword = currentLine[0]
         flag    = currentLine[1]
-        
-        if(keyword in ['restart', 'accelerated']):
-                            
-            if(flag.upper() == 'FALSE'):
-                                
-                flag = False 
-                            
-            else:
-                                
-                flag = True
-        
+
         if(keyword in ['processors']):
             
             flag = int(flag)
+        
+        if(keyword in ['agents']):
+                            
+            if(flag.upper() == 'NONE'):
+                                
+                flag = None
+                                
+            else:
+                                
+                flag = int(flag)
         
         if(keyword in ['parallelization', 'file']):
             
@@ -346,17 +373,17 @@ class initCls(meta):
         
         # Process information.    
         keyword = currentLine[0]
-        flag    = currentLine[1]
+        flag = currentLine[1]
         
         if(keyword == 'optimizer'):
                             
-            toolbox  = currentLine[1].split('-')[0]
+            toolbox = currentLine[1].split('-')[0]
                         
             algorithm = currentLine[1].split('-')[1]
                         
             initDict['OPT']['algorithm'] = algorithm
                             
-            initDict['OPT']['toolbox']   = toolbox
+            initDict['OPT']['toolbox'] = toolbox
             
             initDict['OPT']['optimizer'] = flag
             
@@ -383,28 +410,6 @@ class initCls(meta):
         # Finishing.
         return initDict
 
-    def _processSPOUSE(self, initDict, currentLine):
-        ''' Process optimization details.
-        '''
-        # Antibugging.
-        assert (isinstance(initDict, dict))
-        assert (isinstance(currentLine, list))
-        assert (len(currentLine) == 2)
-        
-        # Process information.    
-        keyword = currentLine[0]
-        flag    = currentLine[1]
-        
-        if(keyword in ['income']):
-            
-            flag = float(flag)
-    
-        # Construct dictionary.        
-        initDict['SPOUSE'][keyword] = flag
-        
-        # Finishing.
-        return initDict
-        
     def _processBASICS(self, initDict, currentLine):
         ''' Process optimization details.
         '''
@@ -415,15 +420,11 @@ class initCls(meta):
         
         # Process information.    
         keyword = currentLine[0]
-        flag    = currentLine[1]
+        flag = currentLine[1]
         
         if(keyword in ['subsidy', 'cost', 'discount']):
             
             flag = float(flag)
-                
-        if(keyword == 'periods'):
-                        
-            flag = int(flag)
 
         # Construct dictionary.        
         initDict['BASICS'][keyword] = flag
@@ -436,26 +437,25 @@ class initCls(meta):
         '''
         initDict = {}
 
-        initDict['PARAS']   = None
-
-
-        initDict['UTILITY']     = {}
+        initDict['PARAS'] = None
         
-        initDict['BASICS']      = {}
+        initDict['OBSERVED'] = {}
 
-        initDict['SPOUSE']      = {}
+        initDict['UTILITY'] = {}
+        
+        initDict['BASICS'] = {}
 
-        initDict['SHOCKS']      = {}
+        initDict['SHOCKS'] = {}
 
-        initDict['DERIV']       = {}
+        initDict['DERIV'] = {}
 
-        initDict['WAGE']        = {}
+        initDict['WAGE'] = {}
                                         
-        initDict['OPT']         = {}
+        initDict['OPT'] = {}
 
-        initDict['EST']         = {}   
+        initDict['EST'] = {}   
 
-        initDict['SIM']         = {}   
+        initDict['SIM'] = {}   
 
 
         for keyword in ['coeffs', 'child']:
@@ -464,34 +464,34 @@ class initCls(meta):
     
             initDict['UTILITY'][keyword]['value'] = []
             
-            initDict['UTILITY'][keyword]['pos']   = []
+            initDict['UTILITY'][keyword]['pos'] = []
     
-            initDict['UTILITY'][keyword]['free']  = []
+            initDict['UTILITY'][keyword]['free'] = []
             
         
         initDict['UTILITY']['int'] = {}
         
         initDict['UTILITY']['int']['value'] = []
 
-        initDict['UTILITY']['int']['free']  = []
+        initDict['UTILITY']['int']['free'] = []
 
 
         for keyword in ['coeffs', 'exper']:
 
             initDict['WAGE'][keyword] = {}
     
-            initDict['WAGE'][keyword]['value']  = []
+            initDict['WAGE'][keyword]['value'] = []
     
-            initDict['WAGE'][keyword]['pos']    = []
+            initDict['WAGE'][keyword]['pos'] = []
     
-            initDict['WAGE'][keyword]['free']   = []
+            initDict['WAGE'][keyword]['free'] = []
     
 
-        initDict['WAGE']['int']    = {}
+        initDict['WAGE']['int'] = {}
         
-        initDict['WAGE']['int']['value']  = []
+        initDict['WAGE']['int']['value'] = []
 
-        initDict['WAGE']['int']['free']   = []
+        initDict['WAGE']['int']['free'] = []
         
         
         initDict['SHOCKS'] = {}
@@ -500,21 +500,21 @@ class initCls(meta):
 
         initDict['SHOCKS']['eps']['value'] = None
 
-        initDict['SHOCKS']['eps']['free']  = None
+        initDict['SHOCKS']['eps']['free'] = None
 
 
         initDict['SHOCKS']['eta'] = {}
 
         initDict['SHOCKS']['eta']['value'] = None
         
-        initDict['SHOCKS']['eta']['free']  = None
+        initDict['SHOCKS']['eta']['free'] = None
         
         
         initDict['SHOCKS']['rho'] = {}
 
         initDict['SHOCKS']['rho']['value'] = None
         
-        initDict['SHOCKS']['rho']['free']  = None
+        initDict['SHOCKS']['rho']['free'] = None
         
         # Finishing.
         return initDict
