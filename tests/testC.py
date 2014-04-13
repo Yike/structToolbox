@@ -31,59 +31,35 @@ class testCls(object):
     
     def test_case_1(self):
         
-        simulate(initFile = '../dat/testC.ini')
-        
         ''' Process initialization file.
         '''
         initObj = initCls()
         
-        initObj.read('../dat/testC.ini')
-        
+        initObj.read('../dat/testB.ini')
+                
         initObj.lock()
         
         ''' Distribute information.
         '''
-        obsEconomy = pkl.load(open('testC.pkl', 'r'))
-        
-        
         initDict = initObj.getAttr('initDict')
-        
-        optimization = initDict['OPT']
-        
+               
         parasObj     = initDict['PARAS']
-        
-        estimation   = initDict['EST']
-        
-        derived      = initDict['DERIV']
             
-        for static in [True, False]:
-            
-            
-            derived['static'] = static
-            
-        
-            requestObj = requestCls()
-            
-            requestObj.setAttr('parasObj', parasObj)
-            
-            requestObj.setAttr('obsEconomy', obsEconomy)
-            
-            requestObj.setAttr('estimation', estimation)
-            
-            requestObj.setAttr('derived', derived)
-            
-            requestObj.setAttr('optimization', optimization)
-            
-            requestObj.lock()
-            
-            ''' Call optimization.
-            '''
-            optimize(requestObj)
-                
-            rslt = pkl.load(open('rslt.struct.pkl', 'r'))
+        paraObjs     = parasObj.getAttr('paraObjs')
 
-            assert_true(np.allclose(rslt['fun'], -0.828142553494) == True)
+
+        for paraObj in paraObjs:
             
+            value = paraObj.getAttr('value')
+            
+            if(paraObj.getAttr('rest')[0] in ['fixed']): continue
+            
+            ext   = parasObj._transformToExternal(paraObj, value)
+            
+            int_  = parasObj._transformToInternal(paraObj, ext)
+            
+            assert_almost_equal(value, int_)
+                    
 ''' Execution of module as script.
 '''
 if __name__ == '__main__':

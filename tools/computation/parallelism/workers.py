@@ -47,10 +47,14 @@ file_       = estimation['file']
 
 strategy    = estimation['parallelization']
 
+agents      = estimation['agents']
 
 ''' Distribute attributes.
 '''
 obsEconomy = pkl.load(open(file_ + '.pkl', 'r'))
+
+obsEconomy.subset(agents)
+
 
 agentObjs  = obsEconomy.getAttr('agentObjs')
 
@@ -108,16 +112,13 @@ while True:
             # Process new parametrization.
             paraVals = np.tile(np.nan, numParas) 
     
-            comm.Bcast([paraVals, MPI.FLOAT], root = 0) 
+            comm.Bcast([paraVals, MPI.DOUBLE], root = 0) 
             
             parasObj.update(paraVals, 'internal', 'all')
     
             # Evaluate likelihood.
             likl = _scalarEvaluations(economyObj, parasObj)
     
-            # Scaling.
-            likl = (numSubset/float(numAgents))*likl
-            
             likl = np.array(likl)
             
             # Reduce operation.

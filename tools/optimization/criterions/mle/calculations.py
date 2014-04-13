@@ -36,9 +36,7 @@ def _staticCalculation(obsEconomy, parasObj):
     '''
     # Distribute class attributes
     numPeriods = obsEconomy.getAttr('numPeriods')
-
-    numAgents  = obsEconomy.getAttr('numAgents')
-    
+        
     attr       = obsEconomy.getAttr('attr')
 
     # Auxiliary objects.
@@ -115,18 +113,14 @@ def _staticCalculation(obsEconomy, parasObj):
     likl    = -np.log(contrib)
     
     likl    = np.sum(likl)
-    
-    likl    = (1.0/float(numAgents))*likl
-    
+        
     # Finishing
     return likl
 
 def _scalarEvaluations(obsEconomy, parasObj):
     ''' Calculation of likelihood using OOP paradigm.
     '''
-    # Distribute class attributes.
-    numAgents  = obsEconomy.getAttr('numAgents')
-    
+    # Distribute class attributes.  
     numPeriods = obsEconomy.getAttr('numPeriods')
     
     agentObjs  = obsEconomy.getAttr('agentObjs')
@@ -151,9 +145,6 @@ def _scalarEvaluations(obsEconomy, parasObj):
                                               
             # Collect results.
             likl = likl + prob
-    
-    # Scaling.
-    likl = (1.0/float(numAgents))*likl
     
     # Finishing.
     return likl

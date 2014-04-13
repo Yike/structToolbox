@@ -2,8 +2,10 @@
 ''' Test cases
 '''
 # standard library
-import numpy as np
-import scipy.stats
+import numpy    as np
+np.seterr('ignore')
+
+import cPickle  as pkl
 
 import sys
 import os
@@ -11,13 +13,15 @@ import os
 # testing library
 from nose.core  import runmodule
 from nose.tools import *
-
+ 
 # Pythonpath
 dir_ = os.path.dirname(os.path.realpath(__file__)).replace('/tests', '')
 sys.path.insert(0, dir_)
 
 # project library
-import tools.computation.f90.f90_main as fort
+from tools.user.interface           import *
+from tools.optimization.interface   import optimize
+from scripts.simulate               import simulate
 
 # Set working directory.
 dir_ = os.path.abspath(os.path.split(sys.argv[0])[0])
@@ -26,96 +30,66 @@ os.chdir(dir_)
 class testCls(object):
     
     def test_case_1(self):
-        ''' Test dot product calculation.
+        
+        simulate(initFile = '../dat/testB.ini')
+        
+        ''' Process initialization file.
         '''
+        initObj = initCls()
         
-        for _ in range(1000):
-
-
-            dim = np.random.randint(1, 100)
+        initObj.read('../dat/testB.ini')
         
-            a   = np.random.randn(dim)
-            
-            b   = np.random.randn(dim)
-            
-            
-            f90 = fort.wrapper_dotproduct(a, b)
-            
-            py  = np.dot(a,b)
-            
-            
-            assert_true(np.allclose(f90, py) == True)
-            
-    def test_case_2(self):
-        ''' Test dot product calculation.
+        initObj.lock()
+        
+        ''' Distribute information.
         '''
+        obsEconomy = pkl.load(open('testB.pkl', 'r'))
         
-        for _ in range(1000):
-    
-            eval_ = np.random.normal(scale = 10)
-    
-            mean  = np.random.normal(scale = 10)
-    
-            sd    = np.random.normal(scale = 10)**2
-    
+        
+        initDict = initObj.getAttr('initDict')
+        
+        optimization = initDict['OPT']
+        
+        parasObj     = initDict['PARAS']
+        
+        estimation   = initDict['EST']
+        
+        derived      = initDict['DERIV']
+        
+        fval         = None
+        
+        for static in [True, False]:
             
-            f90   = fort.wrapper_norm_cdf(eval_, mean, sd)
             
-            py    = scipy.stats.norm.cdf(eval_, mean, sd)
+            derived['static'] = static
             
+        
+            requestObj = requestCls()
             
-            assert_true(np.allclose(f90, py) == True)
+            requestObj.setAttr('parasObj', parasObj)
+            
+            requestObj.setAttr('obsEconomy', obsEconomy)
+            
+            requestObj.setAttr('estimation', estimation)
+            
+            requestObj.setAttr('derived', derived)
+            
+            requestObj.setAttr('optimization', optimization)
+            
+            requestObj.lock()
+            
+            ''' Call optimization.
+            '''
+            optimize(requestObj)
+            
+            ''' Check results.
+            ''' 
+            rslt = pkl.load(open('rslt.struct.pkl', 'r'))
 
-    def test_case_3(self):
-        ''' Test normal pdf calculation.
-        '''
-        
-        for _ in range(1000):
-    
-            eval_ = np.random.normal(scale = 10)
-    
-            mean  = np.random.normal(scale = 10)
-    
-            sd    = np.random.normal(scale = 10)**2
-    
+            if(fval is None): fval = rslt['fun']
             
-            f90   = fort.wrapper_norm_pdf(eval_, mean, sd)
+            assert_true(np.allclose(fval, -165.628510699) == True)
             
-            py    = scipy.stats.norm.pdf(eval_, mean, sd)
-            
-            
-            assert_true(np.allclose(f90, py) == True)
-
-    def test_case_4(self):
-        ''' Test sqrt calculation.
-        '''
-        
-        for _ in range(1000):
-    
-            eval_ = np.random.normal(scale = 10)**2
-   
-            f90   = fort.wrapper_sqrt(eval_)  
-            
-            py    = np.sqrt(eval_)
-            
-            
-            assert_true(np.allclose(f90, py) == True)        
-
-    def test_case_5(self):
-        ''' Test log calculation.
-        '''
-        
-        for _ in range(1000):
-    
-            eval_ = np.random.normal(scale = 10)**2 
-   
-            f90   = fort.wrapper_log(eval_)  
-            
-            py    = np.log(eval_)
-            
-            
-            assert_true(np.allclose(f90, py) == True)        
-                            
 ''' Execution of module as script.
 '''
 if __name__ == '__main__':

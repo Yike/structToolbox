@@ -166,15 +166,12 @@ class commCls(meta):
     
         comm.Bcast([values, MPI.FLOAT], root = MPI.ROOT)
         
-        likl = np.array(0.0, 'float64')
+        likl = np.array(0.0)
             
         comm.Reduce(None, [likl, MPI.DOUBLE], op = MPI.SUM, root = MPI.ROOT)
-            
-        # Scaling.
-        rslt = likl
         
         # Finishing.
-        return rslt
+        return likl
         
     def _derivedAttributes(self):
         ''' Derived attributes.

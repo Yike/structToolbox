@@ -168,8 +168,8 @@ def process(data, initFile = 'init.ini'):
     
     ''' Store.
     '''
-    file_ = data.split('.')[:-1][0] + '.pkl'
-
+    file_ = data[:data.rfind('.')] + '.pkl'
+    
     economyObj.store(file_)
 
 ''' Auxiliary functions.
@@ -285,7 +285,7 @@ if __name__ == '__main__':
     parser.add_argument('--data', \
                         action  = 'store', \
                         dest    = 'data', \
-                        default = None, \
+                        required = True, \
                         help    = 'source file for processing')
     
     initFile, data = _distributeInput(parser)
