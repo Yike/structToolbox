@@ -28,6 +28,8 @@ def logging(scipyObj, isFinal):
                 
         x = parasObj.getValues('internal', 'all')
         
+        scipyObj.attr['paras']['step'] = x
+        
         np.savetxt('stepParas.struct.out', x, fmt = '%15.10f')
          
     # Initialize start.

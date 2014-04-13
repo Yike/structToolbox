@@ -57,6 +57,12 @@ class scipyCls(meta):
         
         self.attr['fval']['start']   = None        
 
+        
+        self.attr['paras'] = {}
+        
+        self.attr['paras']['step']   = None
+        
+
         self.attr['step'] = 0
 
         # Status.
@@ -109,7 +115,12 @@ class scipyCls(meta):
                 rslt = self._bfgs(startVals, maxiter, opts)
             
             sys.stdout = sys.__stdout__
-                    
+        
+        # Alignment.
+        rslt['x']   = self.attr['paras']['step']
+        
+        rslt['fun'] = self.attr['fval']['step']
+        
         # Logging.
         self.attr['rslt'] = rslt
         
@@ -129,7 +140,7 @@ class scipyCls(meta):
         epsilon = opts['epsilon']
         
         # Interface to algorithm.
-        opt = fmin_bfgs(self._criterionFunction, startVals, \
+        opt = fmin_bfgs(self._criterionFunction, startVals, fprime = self._gradientFunction, \
                 gtol = gtol, epsilon = epsilon, maxiter = maxiter, \
                 full_output = True)
         

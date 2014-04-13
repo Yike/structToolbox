@@ -49,8 +49,10 @@ class economyCls(meta):
         ''' Select a subset of agents only.
         '''
         # Antibugging. 
-        assert (isinstance(numSubset, int))
-        assert (0 < numSubset <= self.attr['numAgents'])
+        if(numSubset is not None):
+    
+            assert (isinstance(numSubset, int))
+            assert (0 < numSubset <= self.attr['numAgents'])
         
         # Check applicability.
         if(numSubset is None): return

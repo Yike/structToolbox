@@ -116,7 +116,7 @@ while True:
             likl = _scalarEvaluations(economyObj, parasObj)
     
             # Scaling.
-            likl = (numSubset*likl)/float(numAgents)
+            likl = (numSubset/float(numAgents))*likl
             
             likl = np.array(likl)
             
