@@ -9,6 +9,13 @@ import argparse
 import sys
 import os
 
+# Check for appropriate version.
+assert (sys.version_info[:2] == (2,7)), \
+'''\n\n This release of the structToolbox is targeted towards Python 2.7.x,
+ we will update to Python 3.x.x in our next iteration. Please change
+ your default Python Interpreter accordingly.\n'''
+
+
 # Pythonpath
 dir_ = os.path.dirname(os.path.realpath(__file__)).replace('/scripts', '')
 sys.path.insert(0, dir_)

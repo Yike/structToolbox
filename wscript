@@ -143,7 +143,7 @@ def remove_filetypes_distclean(path):
 
         for filetypes in ['*.aux','*.log','*.pyc', '*.so', '*~', '*tar', \
             '*.zip', '.waf*', '*lock*', '*.mod', '*.a', '*.pkl', '*.out', '*.pyo', '*.info',\
-            '.pid', '*.struct.*']:
+            '.pid', '*.struct.*', '__pycache__']:
 
                 for filename in fnmatch.filter(filenames, filetypes):
                     
@@ -156,6 +156,10 @@ def remove_filetypes_distclean(path):
     for files in matches:
 
         remove_for_distclean(files)
+
+    for dirName, _, _ in os.walk('.'):
+        
+        if('__pycache__' in dirName): shutil.rmtree(dirName)
 
 def set_project_paths(ctx):
     ''' Return a dictionary with project paths represented by Waf nodes. This is

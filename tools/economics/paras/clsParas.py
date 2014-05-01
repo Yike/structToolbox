@@ -149,7 +149,7 @@ class parasCls(meta):
             
             if((isFree == False) and (which == 'all')):
                 
-                assert (paraObj.getAttr('value') == x[counter])
+                assert (np.allclose(paraObj.getAttr('value'), x[counter]))
                 
                 counter = counter + 1
             

@@ -4,8 +4,15 @@
 
 # standard library.
 import os
+import sys
 import glob
 import argparse
+
+# Check for appropriate version.
+assert (sys.version_info[:2] == (2,7)), \
+'''\n\n This release of the structToolbox is targeted towards Python 2.7.x,
+ we will update to Python 3.x.x in our next iteration. Please change
+ your default Python Interpreter accordingly.\n'''
 
 ''' Main function.
 '''
@@ -13,8 +20,10 @@ def clean(resume = False):
     ''' Cleanup after estimation run.
     '''
     # Potential files.
-    fileList = glob.glob('*.struct.*')
-        
+    fileList  = glob.glob('*.struct.*')
+    
+    fileList += glob.glob('.struct.pid')
+   
     # Ensure resume.
     if(resume):
         

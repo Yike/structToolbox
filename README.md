@@ -3,9 +3,9 @@ structToolbox
 
 Toolbox for the illustration of reliable structural estimation. Building on the illustrative model from:
 
-Michael Keane, Petra Todd, and Kenneth Wolpin (2011). The Structural Estimation of Behavioral Models: Discrete Choice Dynamic Programming Methods and Applications, *Handbook of Labor Economics*, Elsevier. 
+Michael P. Keane, Petra E. Todd, and Kenneth I. Wolpin (2011). The Structural Estimation of Behavioral Models: Discrete Choice Dynamic Programming Methods and Applications, *Handbook of Labor Economics*, Elsevier. 
 
-Online Documentation (under construction):
+Online Documentation:
 
 http://www.policy-lab.org/structToolbox
 

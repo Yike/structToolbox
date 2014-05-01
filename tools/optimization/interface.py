@@ -1,5 +1,7 @@
 ''' Interface to optimization algorithms.
 '''
+# standard library
+import os
 
 # project library
 from tools.optimization.algorithms.clsAlgorithms    import algoCls
@@ -95,4 +97,8 @@ def optimize(requestObj):
     
     ''' Wrapping up.
     '''
-    if(numProcs > 1): commObj.terminate()   
+    if(numProcs > 1): commObj.terminate()  
+    
+    if(os.path.exists('.struct.pid')): os.remove('.struct.pid')
+        
+         

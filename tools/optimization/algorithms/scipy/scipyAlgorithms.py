@@ -104,7 +104,7 @@ class scipyCls(meta):
         
         else:
             
-            sys.stdout = open('scipy.struct.log', 'a')
+            sys.stdout = open('scipy.struct.log', 'w')
             
             if(optimizer == 'SCIPY-POWELL'):
                 
@@ -177,17 +177,17 @@ class scipyCls(meta):
         # Interface to algorithm.
         opt = fmin_powell(self._criterionFunction, startVals, \
                     xtol = xtol, ftol = ftol, maxiter = maxiter, \
-                    maxfun = maxfun)   
+                    maxfun = maxfun, full_output = True)   
         
         # Prepare interface.
         rslt = {}; rslt['x'], rslt['fun'] = opt[0], opt[1]
-
-                    
+            
+            
         msg = 'None'
 
-        if(opt[5] == 1): msg = 'Maximum number of function evaluations.'
+        if(opt[5] == 1): msg = 'Maximum number of function evaluations exceeded.'
         
-        if(opt[5] == 2): msg = 'Maximum number of iterations.'   
+        if(opt[5] == 2): msg = 'Maximum number of iterations exceeded.'   
     
         rslt['message'] = msg
         
