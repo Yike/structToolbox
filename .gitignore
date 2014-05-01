@@ -1,0 +1,7 @@
+.waf*
+.bld
+.lock-wafbuild
+tools/computation/f90/f90_main.so
+tools/computation/f90/include
+tools/computation/f90/lib
+*.pyc
