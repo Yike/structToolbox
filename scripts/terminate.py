@@ -2,19 +2,20 @@
 ''' Terminate estimation run.
 '''
 
+# Check for appropriate Python version.
+import sys
+
+assert (sys.version_info[:2] == (2,7)), \
+'''\n\n This release of the structToolbox is targeted towards Python 2.7.x,
+ we will update to Python 3.x.x in our next iteration. Please change
+ your default Python Interpreter accordingly.\n'''
+ 
 # standard library.
 import numpy as np
 
 import subprocess
 import argparse
 import os
-import sys
-
-# Check for appropriate version.
-assert (sys.version_info[:2] == (2,7)), \
-'''\n\n This release of the structToolbox is targeted towards Python 2.7.x,
- we will update to Python 3.x.x in our next iteration. Please change
- your default Python Interpreter accordingly.\n'''
 
 ''' Execution of module as script.
 '''

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-''' Test cases
+''' Test cases that ensures that the static code yields the same result as the
+    dynamic version in the special case of a 0.0 discount factor.
 '''
 # standard library
 import numpy    as np

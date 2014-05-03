@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-''' Test cases
+''' Test cases that ensures that the transformations between internal
+    and external parameter values are correct and can be reversed.
 '''
 # standard library
 import numpy    as np

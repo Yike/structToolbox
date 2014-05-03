@@ -2,17 +2,18 @@
 ''' Cleanup.
 '''
 
-# standard library.
-import os
+# Check for appropriate Python version.
 import sys
-import glob
-import argparse
 
-# Check for appropriate version.
 assert (sys.version_info[:2] == (2,7)), \
 '''\n\n This release of the structToolbox is targeted towards Python 2.7.x,
  we will update to Python 3.x.x in our next iteration. Please change
  your default Python Interpreter accordingly.\n'''
+
+# standard library.
+import os
+import glob
+import argparse
 
 ''' Main function.
 '''

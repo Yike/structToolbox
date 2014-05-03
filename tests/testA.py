@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-''' Test cases
+''' Test cases that ensure that the results obtained from the Fortran routines
+    are identical to the Python counterparts.
 '''
 # standard library
 import numpy as np
