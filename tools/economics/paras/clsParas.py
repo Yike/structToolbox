@@ -6,7 +6,7 @@ import numpy as np
 
 # project library
 from tools.clsMeta  import meta
-from clsPara        import paraCls
+from tools.economics.paras.clsPara        import paraCls
 
 class parasCls(meta):
     ''' Class that holds the full set of parameters involved in the 
@@ -100,10 +100,10 @@ class parasCls(meta):
 
         # Collect parameters.
         x = []
-        
+
         for paraObj in paraObjs:
-            
-            # Check applicability/
+
+            # Check applicability.
             isFree = paraObj.getAttr('update')
             
             if(which == 'free' and (isFree == False)): continue
@@ -148,7 +148,7 @@ class parasCls(meta):
             isFree = paraObj.getAttr('update')
             
             if((isFree == False) and (which == 'all')):
-                
+
                 assert (np.allclose(paraObj.getAttr('value'), x[counter]))
                 
                 counter = counter + 1
@@ -348,6 +348,8 @@ class parasCls(meta):
 
         dict_['subsidy']    = None
 
+        dict_['discount']    = None
+        
         dict_['experience'] = None
 
 
@@ -475,8 +477,8 @@ class parasCls(meta):
             for paraObj in paraObjs:
                         
                 type_ = paraObj.getAttr('type')
-         
-                if(type_ != 'BASICS'): 
+ 
+                if(type_ != 'ENVIRO'): 
                             
                     continue
                         
@@ -517,7 +519,7 @@ class parasCls(meta):
             for paraObj in paraObjs:
                     
                 subtype = paraObj.getAttr('subtype') 
-
+           
                 if(subtype != request): 
                         
                     continue
@@ -525,7 +527,7 @@ class parasCls(meta):
                 else:
                         
                     value = paraObj.getAttr('value')
-                        
+
                     rslt = rslt + [value] 
         
         rslt[2] = rslt[2]*rslt[0]*rslt[1]

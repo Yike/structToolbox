@@ -4,16 +4,17 @@
 # Check for appropriate Python version.
 import sys
 
-assert (sys.version_info[:2] == (2,7)), \
-'''\n\n This release of the structToolbox is targeted towards Python 2.7.x,
- we will update to Python 3.x.x in our next iteration. Please change
- your default Python Interpreter accordingly.\n'''
+assert (sys.version_info[:2][0] == 3), \
+'''\n\n The structToolbox is targeted towards Python 3.x.x. Please
+ change your Python Interpreter accordingly.\n'''
  
 # standard library
-import numpy  as np
+import pickle as pkl
 import pandas as pd
+import numpy  as np
 
 import argparse
+import shutil
 import os
 
 # Pythonpath
@@ -21,42 +22,43 @@ dir_ = os.path.dirname(os.path.realpath(__file__)).replace('/scripts', '')
 sys.path.insert(0, dir_)
 
 # project library
-import tools.computation.performance.performance as perf
+from tools.auxiliary import readStep
+from tools.auxiliary import writeStep
 
-from tools.optimization.criterions.mle.calculations import sampleLikelihood
+from tools.optimization.criterion.clsCrit import critCls
 
-from tools.user.interface                           import *
+from tools.economics.interface  import agentCls
+from tools.economics.interface  import economyCls
 
-from tools.economics.interface                      import *
+from tools.user.interface       import initCls
 
-def simulate(initFile = 'init.ini', update = False):
+def simulate(update = False, observed = False, inform = False, source = None):
     ''' Simulation of agent population.
     '''
     # Antibugging.
-    assert (isinstance(initFile, str))    
-    assert (os.path.exists(initFile))
-    
+    assert (os.path.exists('model.struct.ini'))
+    assert (observed in [True, False])
+    assert (update   in [True, False])
+    assert (inform   in [True, False])
+        
     ''' Process initialization file.
     '''
     initObj = initCls()
     
-    initObj.read(initFile)
+    initObj.read()
     
     initObj.lock()
     
     ''' Distribute information.
     '''
-    initDict = initObj.getAttr('initDict')
-    
+    initDict   = initObj.getAttr('initDict')
     
     numPeriods = initDict['SIM']['periods']
     
     numAgents  = initDict['SIM']['agents']
     
     seed       = initDict['SIM']['seed']
-    
-    file_      = initDict['SIM']['file']
-    
+        
     allPos     = initDict['DERIV']['pos']
     
     parasObj   = initDict['PARAS']  
@@ -67,74 +69,98 @@ def simulate(initFile = 'init.ini', update = False):
     '''
     if(update):
         
-        x = np.genfromtxt('stepParas.struct.out')
-        
+        x = readStep('paras')
+
         parasObj.update(x, 'internal', 'all')
-        
-    ''' Simulate agent population.
+    
+    
+    ''' Simulate agent attributes.
     '''
     np.random.seed(seed)
     
-    agentObjs = []
-   
-    for _ in range(numAgents):
-        
-        ''' Construct attributes.
-        '''
-        values, attr = {}, {}
-   
-        for t in range(numPeriods):
-            
-            values[t] = {}
-            
-            for i in allPos:
-                
-                values[t][i] = np.random.rand()
-        
-        # Spouse.
-        attr['spouse'] = _constructSpouse(numPeriods)
-
-        # Children.
-        pos = initDict['UTILITY']['child']['pos']
+    attrs = []
     
-        attr['children'] = _constructChildren(numPeriods)
-        
-        # Experience.
-        pos = initDict['WAGE']['exper']['pos']
     
-        attr['experience'] = [0.0]
+    if(source is not None):
+        
+        sourceAgents = _getSources(source, numAgents)
+        
+        for i in range(numAgents):
+            
+            attr = {}
+            
+            for key_ in ['experience', 'children', 'utility', \
+                             'spouse', 'wage']:
                     
-        # Utility.
-        attr['utility'] = []
+                attr[key_] = sourceAgents[i].getAttr('attr')[key_]
+            
+            attrs = attrs + [attr]
+            
+    else:
+        
+        for _ in range(numAgents):
+        
+            attr, values = {}, {}
+       
+            for t in range(numPeriods):
+                
+                values[t] = {}
+                
+                for j in allPos:
+                    
+                    values[t][j] = np.random.rand()
+            
+            # Spouse.
+            attr['spouse'] = _constructSpouse(numPeriods)
     
-        list_ = initDict['UTILITY']['coeffs']['pos']
+            # Children.
+            pos = initDict['UTILITY']['child']['pos']
         
-        for t in range(numPeriods):
-        
-            cand =  []
-
-            for pos in list_:
-                
-                cand = cand + [values[t][pos]]
+            attr['children'] = _constructChildren(numPeriods)
             
-            attr['utility'] = attr['utility'] + [cand]    
+            # Experience.
+            pos = initDict['WAGE']['exper']['pos']
         
-        # Wage.
-        attr['wage'] = []
+            attr['experience'] = [0.0]
+                        
+            # Utility.
+            attr['utility'] = []
         
-        list_ = initDict['WAGE']['coeffs']['pos']
-        
-        for t in range(numPeriods):
-        
-            cand =  []
-
-            for pos in list_:
-                
-                cand = cand + [values[t][pos]]
+            list_ = initDict['UTILITY']['coeffs']['pos']
             
-            attr['wage'] = attr['wage'] + [cand]    
-
-             
+            for t in range(numPeriods):
+            
+                cand =  []
+    
+                for pos in list_:
+                    
+                    cand = cand + [values[t][pos]]
+                
+                attr['utility'] = attr['utility'] + [cand]    
+            
+            # Wage.
+            attr['wage'] = []
+            
+            list_ = initDict['WAGE']['coeffs']['pos']
+            
+            for t in range(numPeriods):
+            
+                cand =  []
+    
+                for pos in list_:
+                    
+                    cand = cand + [values[t][pos]]
+                
+                attr['wage'] = attr['wage'] + [cand]    
+    
+            attrs = attrs + [attr]
+        
+        
+    # Initialize agents.
+    agentObjs = []
+    
+    for attr in attrs:
+        
         agentObj = agentCls()
                 
         agentObj.setAttr('attr', attr)
@@ -167,13 +193,19 @@ def simulate(initFile = 'init.ini', update = False):
         economyObj.simulate()
     
     
-    ''' Store.
+    ''' Storage.
     '''
-    economyObj.store(file_ + '.pkl')
+    if(inform):
     
-    _writeInfo(economyObj, parasObj, file_)
-
-    _writeData(economyObj, initDict, file_)
+        return economyObj
+    
+    else:
+        
+        economyObj.store('simEconomy.struct.pkl')
+        
+        _writeInfo(economyObj, parasObj)
+    
+        if(observed): _writeData(economyObj, initDict)
         
 ''' Auxiliary functions.
 '''
@@ -184,18 +216,50 @@ def _distributeInput(parser):
     args = parser.parse_args()
 
     # Distribute arguments.
-    initFile = args.init 
-    
     update   = args.update
     
+    observed = args.observed
+    
+    source   = args.source
+    
     # Assertions.
-    assert (initFile is not None)
-    assert (os.path.exists(initFile))
+    assert (os.path.exists('model.struct.ini'))
     assert (update in [False, True])
+    assert (observed in [True, False])
+    
+    if(source is not None): 
+        
+        assert (os.path.exists(source))
     
     # Finishing.
-    return initFile, update
+    return update, observed, source
 
+def _getSources(source, numAgents):
+    ''' Get sourced agents.
+    '''
+    # Antibugging.
+    assert (os.path.exists(source))
+    assert (isinstance(numAgents, int))
+    assert (numAgents > 0)
+        
+    # Load sources.
+    sourceEconomy = pkl.load(open(source))
+        
+    sourceAgents  = sourceEconomy.getAttr('agentObjs')
+
+    numSources    = sourceEconomy.getAttr('numAgents')    
+    
+    # Sampling.
+    replace = False
+        
+    if(numAgents > numSources): replace = True
+        
+    sourceAgents = np.random.choice(sourceAgents, size = numAgents, \
+                        replace = replace)
+            
+    # Finishing.
+    return sourceAgents
+        
 def _constructSpouse(numPeriods):
     ''' Construct a history of spouse income.
     '''
@@ -237,7 +301,7 @@ def _constructChildren(numPeriods):
     # Finishing.
     return list_
     
-def _writeData(obsEconomy, initDict, file_):
+def _writeData(obsEconomy, initDict):
     ''' Write out simulated economy to a text file.
     '''    
     # Distribute class attributes.
@@ -310,8 +374,7 @@ def _writeData(obsEconomy, initDict, file_):
     
     ints = ints + initDict['UTILITY']['child']['pos']
     
-    ints = ints + initDict['OBSERVED']['choice']
-    
+    ints = ints + [initDict['OBSERVED']['choice']]
     
     formats = {}
     
@@ -322,7 +385,7 @@ def _writeData(obsEconomy, initDict, file_):
         if(idx in ints): formats[idx] = _formatInteger
         
         
-    with open(file_ + '.txt', 'wb') as file_:
+    with open('simEconomy.struct.txt', 'w', newline = '') as file_:
         
         df.to_string(file_, index = False, header = None, na_rep = '.', formatters=formats)
 
@@ -348,24 +411,44 @@ def _formatInteger(x):
         
         return "%5d" % x
             
-def _writeInfo(obsEconomy, parasObj, file_):
+def _writeInfo(obsEconomy, parasObj):
     ''' Write some info about the simulated economy to a text file.
     '''
     
-    # Write parameters.
-    x = parasObj.getValues('internal', 'all')
 
-    np.savetxt(file_ + '.paras.struct.out', x, fmt = '%15.10f')
+    
+    # Criterion class.
+    derived = {}
+    
+    derived['static'] = False
+    
+    
+    critObj = critCls()
+    
+    critObj.setAttr('parasObj', parasObj)
+    
+    critObj.setAttr('obsEconomy', obsEconomy)
+
+    critObj.setAttr('derived', derived)
+    
+    critObj.lock()
     
     # Document choices.
     numPeriods = str(obsEconomy.getAttr('numPeriods'))
     
     numAgents  = str(obsEconomy.getAttr('numAgents'))
     
-    fval       = str(sampleLikelihood(obsEconomy, parasObj, False))
+    fval       = str(critObj._sampleLikelihood(parasObj))
+
+    # Write parameters.
+    x = parasObj.getValues('internal', 'all')
+
+    writeStep(x, fval, count = '---', pkl_ = False)
+    
+    shutil.move('stepInfo.struct.out', 'simEconomy.paras.struct.out')
     
     
-    with open(file_ + '.infos.struct.out', 'w') as file_:
+    with open('simEconomy.infos.struct.out', 'w') as file_:
         
         file_.write('\n Simulated Economy\n\n')
         
@@ -398,12 +481,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 
         'Simulation of an economy for the structToolbox.', 
         formatter_class = argparse.ArgumentDefaultsHelpFormatter)
-
-    parser.add_argument('--init', \
-                        action  = 'store', \
-                        dest    = 'init', \
-                        default = 'init.ini', \
-                        help    = 'specify initialization file')
     
     parser.add_argument('--update', \
                         action  = 'store_true', \
@@ -411,7 +488,18 @@ if __name__ == '__main__':
                         default = False, \
                         help    = 'update structural parameters')
 
+    parser.add_argument('--observed', \
+                        action  = 'store_true', \
+                        dest    = 'observed', \
+                        default = False, \
+                        help    = 'write out *.txt file')
 
-    initFile, update = _distributeInput(parser)
+    parser.add_argument('--source', \
+                        action  = 'store', \
+                        dest    = 'source', \
+                        default = None, \
+                        help    = 'source file for agent attributes')
     
-    simulate(initFile = initFile, update = update)
+    update, observed, source = _distributeInput(parser)
+    
+    simulate(update = update, observed = observed, source = source)

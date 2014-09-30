@@ -6,8 +6,9 @@
 import numpy    as np
 np.seterr('ignore')
 
-import cPickle  as pkl
+import pickle  as pkl
 
+import shutil
 import sys
 import os
 
@@ -22,6 +23,8 @@ sys.path.insert(0, dir_)
 # project library
 from tools.user.interface           import *
 from tools.optimization.interface   import optimize
+from tools.auxiliary                import readStep
+
 from scripts.simulate               import simulate
 
 # Set working directory.
@@ -32,19 +35,23 @@ class testCls(object):
     
     def test_case_1(self):
         
-        simulate(initFile = '../dat/testB.ini')
+        shutil.copy('../dat/testB.ini', 'model.struct.ini')
+
+        shutil.copy('../dat/optimizers.ini', 'optimizers.struct.ini')
+                
+        simulate()
         
         ''' Process initialization file.
         '''
         initObj = initCls()
         
-        initObj.read('../dat/testB.ini')
+        initObj.read()
         
         initObj.lock()
         
         ''' Distribute information.
         '''
-        obsEconomy = pkl.load(open('testB.pkl', 'r'))
+        obsEconomy = pkl.load(open('simEconomy.struct.pkl', 'rb'))
         
         
         initDict = initObj.getAttr('initDict')
@@ -52,8 +59,6 @@ class testCls(object):
         optimization = initDict['OPT']
         
         parasObj     = initDict['PARAS']
-        
-        estimation   = initDict['EST']
         
         derived      = initDict['DERIV']
         
@@ -70,10 +75,10 @@ class testCls(object):
             requestObj.setAttr('parasObj', parasObj)
             
             requestObj.setAttr('obsEconomy', obsEconomy)
-            
-            requestObj.setAttr('estimation', estimation)
-            
+                        
             requestObj.setAttr('derived', derived)
+            
+            requestObj.setAttr('single', True)
             
             requestObj.setAttr('optimization', optimization)
             
@@ -85,11 +90,15 @@ class testCls(object):
             
             ''' Check results.
             ''' 
-            rslt = pkl.load(open('rslt.struct.pkl', 'r'))
+            rslt = readStep('fval') 
 
-            if(fval is None): fval = rslt['fun']
+            if(fval is None): fval = rslt 
             
             assert_true(np.allclose(fval, -165.628510699) == True)
+            
+        os.remove('model.struct.ini')
+
+        os.remove('optimizers.struct.ini')
             
 ''' Execution of module as script.
 '''

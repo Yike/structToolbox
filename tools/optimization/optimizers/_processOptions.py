@@ -2,22 +2,17 @@
 '''
 
 # standard library
-import os
 import shlex
 
 ''' Main
 '''
-def initializeOptions(source):
+def initializeOptions():
     ''' Initialize the optimization options.
     '''
-    # Antibugging.
-    assert (isinstance(source, str))
-    assert (os.path.exists(source))
-
     # Initialize container.
     optDict = {}
         
-    with open(source, 'r') as initFile:
+    with open('optimizers.struct.ini', 'r') as initFile:
             
         for line in initFile:
                 
@@ -72,6 +67,17 @@ def _processScipyBfgs(optDict, currentLine):
             
         flag = float(flag)
         
+    # Special treatment.
+    if(keyword == 'maxiter'):
+                            
+        if(flag.upper() == 'NONE'):
+                                
+            flag = None
+                                
+        else:
+                                
+            flag = int(flag)
+        
     # Construct dictionary.        
     optDict['SCIPY-BFGS'][keyword] = flag
             
@@ -99,6 +105,16 @@ def _processScipyPowell(optDict, currentLine):
         
         flag = int(flag)
 
+    if(keyword == 'maxiter'):
+                            
+        if(flag.upper() == 'NONE'):
+                                
+            flag = None
+                                
+        else:
+                                
+            flag = int(flag)
+            
     # Construct dictionary.        
     optDict['SCIPY-POWELL'][keyword] = flag
             

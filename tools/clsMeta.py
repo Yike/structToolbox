@@ -2,7 +2,7 @@
 '''
 
 # standard library
-import cPickle as pkl
+import pickle as pkl
 import copy
 
 class meta(object):

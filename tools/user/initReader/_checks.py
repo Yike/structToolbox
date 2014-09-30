@@ -22,13 +22,11 @@ def _basics(initDict):
     ''' Check observed outcomes.
     '''
     dict_ = initDict['OBSERVED']
-
-    assert (dict_.keys() == ['wage', 'spouse', 'choice'])
     
     for key_ in ['wage', 'choice', 'spouse']:
         
-        assert (isinstance(dict_[key_], list))
-        assert (dict_[key_][0] > 0) 
+        assert (isinstance(dict_[key_], int ))
+        assert (dict_[key_] > 0) 
     
     ''' Experience present.
     '''
@@ -59,24 +57,6 @@ def _basics(initDict):
             isFree = isFree + initDict[type_][subtype]['free']
             
     assert (sum(isFree) > 0)
-    
-    ''' Parallelism.
-    '''
-    mpi4py = True
-    
-    try:
-        
-        import mpi4py
-    
-    except ImportError:
-        
-        mpi4py = False
-        
-    if(not mpi4py): assert (initDict['EST']['processors'] ==  1) 
-
-    ''' Parallelization strategies.
-    '''
-    assert (initDict['EST']['parallelization'] in ['function', 'gradient'])
         
 def _identification(initDict):
     ''' Check for identification.

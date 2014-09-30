@@ -80,7 +80,7 @@ def distclean(ctx):
     
     remove_filetypes_distclean('.')
 
-    remove_for_distclean('.waf-1.6.4-8c7ad4bb8e1ca65b04e5d8dd9d0dac54')
+    remove_for_distclean('.waf3-1.6.4-8c7ad4bb8e1ca65b04e5d8dd9d0dac54')
 
     remove_for_distclean('.bld')
 
@@ -118,7 +118,7 @@ def set_permissions():
 
     for file_ in files:
         
-        os.chmod(file_, 0777)
+        os.chmod(file_, 777)
     
 def remove_for_distclean(path):
     ''' Remove path, where path can be either a directory or a file. The
@@ -143,7 +143,7 @@ def remove_filetypes_distclean(path):
 
         for filetypes in ['*.aux','*.log','*.pyc', '*.so', '*~', '*tar', \
             '*.zip', '.waf*', '*lock*', '*.mod', '*.a', '*.pkl', '*.out', '*.pyo', '*.info',\
-            '.pid', '*.struct.*', '__pycache__']:
+            '*.struct.*', '__pycache__']:
 
                 for filename in fnmatch.filter(filenames, filetypes):
                     

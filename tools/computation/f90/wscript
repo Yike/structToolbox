@@ -100,4 +100,4 @@ def f2py_call(self):
     ''' Create the interface to f90_main using f2py.
     '''
 
-    os.system('f2py -c -m  f90_main  f90_main.f90 -Iinclude -Llib -lstruct')
+    os.system('f2py3 -c -m  f90_main  f90_main.f90 -Iinclude -Llib -lstruct')

@@ -3,10 +3,10 @@
 '''
 
 # project library
-from _constructTree     import _constructTree
+from tools.user.initReader._constructTree     import _constructTree
 
-from _constructParas    import _constructParas
+from tools.user.initReader._constructParas    import _constructParas
 
-from _auxiliary         import _processCases, _processLine
+from tools.user.initReader._auxiliary         import _processCases, _processLine
 
-from _checks            import _checks
+from tools.user.initReader._checks            import _checks

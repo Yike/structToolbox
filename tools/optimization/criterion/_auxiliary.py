@@ -7,7 +7,7 @@ from scipy.stats import norm
 import numpy        as np
 
 # project library
-import tools.computation.performance.performance    as perf
+import tools.computation.speed.performance    as perf
 
 def cdfConditional_single(eval_, u, v, real):
     ''' Evaluate the cumulative distribution function of the conditional

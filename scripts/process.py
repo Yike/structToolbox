@@ -4,11 +4,10 @@
 # Check for appropriate Python version.
 import sys
 
-assert (sys.version_info[:2] == (2,7)), \
-'''\n\n This release of the structToolbox is targeted towards Python 2.7.x,
- we will update to Python 3.x.x in our next iteration. Please change
- your default Python Interpreter accordingly.\n'''
-
+assert (sys.version_info[:2][0] == 3), \
+'''\n\n The structToolbox is targeted towards Python 3.x.x. Please
+ change your Python Interpreter accordingly.\n'''
+ 
 # standard library
 import numpy  as np
 import pandas as pd
@@ -21,24 +20,23 @@ dir_ = os.path.dirname(os.path.realpath(__file__)).replace('/scripts', '')
 sys.path.insert(0, dir_)
 
 # project library
-import tools.computation.performance.performance as perf
+import tools.computation.speed.performance as perf
 
 from tools.user.interface        import *
 
 from tools.economics.interface   import *
 
-def process(data, initFile = 'init.ini'):
+def process(data):
     ''' Process of agent population.
     '''
     # Antibugging.
-    assert (isinstance(initFile, str))    
-    assert (os.path.exists(initFile))
+    assert (os.path.exists('model.struct.ini'))
 
     ''' Process initialization file.
     '''
     initObj = initCls()
     
-    initObj.read(initFile)
+    initObj.read()
     
     initObj.lock()
     
@@ -56,7 +54,7 @@ def process(data, initFile = 'init.ini'):
     '''
     df = pd.read_csv(data,  header = -1, delim_whitespace = True)
     
-    df = df.drop(0, axis = 1)
+    #df = df.drop(0, axis = 1)
     
     ''' Get information.
     '''
@@ -102,8 +100,8 @@ def process(data, initFile = 'init.ini'):
             ''' Spouse.
             '''
             pos = initDict['OBSERVED']['spouse']
-            
-            attr['spouse'] += list(df.iloc[row, pos])   
+ 
+            attr['spouse'] += list(df.iloc[row, [pos]])   
 
 
             ''' Endogenous
@@ -116,7 +114,7 @@ def process(data, initFile = 'init.ini'):
             # Wage.
             pos  = initDict['OBSERVED']['wage']
 
-            wage = list(df.iloc[row, pos])[0]
+            wage = list(df.iloc[row, [pos]])[0]
 
             if(wage == '.'): 
                 
@@ -131,7 +129,7 @@ def process(data, initFile = 'init.ini'):
             # Choices.    
             pos  = initDict['OBSERVED']['choice']
     
-            attr['choices'] += [int(df.iloc[row, pos])]
+            attr['choices'] += [int(df.iloc[row, [pos]])]
             
             
             # Update counts.
@@ -226,20 +224,15 @@ def _distributeInput(parser):
     # Parse arguments.
     args = parser.parse_args()
 
-    # Distribute arguments.
-    initFile = args.init 
-    
+    # Distribute arguments.    
     data     = args.data
     
     # Assertions.
-    assert (initFile is not None)
-    assert (os.path.exists(initFile))
-
     assert (data is not None)
     assert (os.path.exists(data))
         
     # Finishing.
-    return initFile, data
+    return data
 
 def getSize(df):
     ''' Get agent count.
@@ -249,9 +242,9 @@ def getSize(df):
 
     # Number of periods.
     numPeriods, i = 1, 1
-        
+                    
     while True:
-        
+
         next_ = (df.iloc[i, 0] == 1.0)
         
         i     = i + 1
@@ -263,10 +256,10 @@ def getSize(df):
     # Number of agents. 
     numRows   = df.shape[0]
         
-    numAgents = numRows/numPeriods
+    numAgents = int(numRows/numPeriods)
         
     remainder = numRows%numPeriods
-        
+                
     # Quality check.
     assert (remainder == 0)
     assert (isinstance(numAgents, int))
@@ -283,18 +276,12 @@ if __name__ == '__main__':
         'Processing of a dataset into an economy object for the structToolbox.', 
         formatter_class = argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument('--init', \
-                        action  = 'store', \
-                        dest    = 'init', \
-                        default = 'init.ini', \
-                        help    = 'specify initialization file')
-
     parser.add_argument('--data', \
                         action  = 'store', \
                         dest    = 'data', \
                         required = True, \
                         help    = 'source file for processing')
     
-    initFile, data = _distributeInput(parser)
+    data = _distributeInput(parser)
     
-    process(initFile = initFile, data = data)
+    process(data = data)

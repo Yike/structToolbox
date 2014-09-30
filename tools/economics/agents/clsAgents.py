@@ -3,7 +3,7 @@
 # project library
 from tools.clsMeta  import meta
 
-import tools.computation.performance.performance    as perf
+import tools.computation.speed.performance    as perf
 
 class agentCls(meta):
     ''' Class instance that represents the agent.

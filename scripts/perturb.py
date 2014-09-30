@@ -4,10 +4,9 @@
 # Check for appropriate Python version.
 import sys
 
-assert (sys.version_info[:2] == (2,7)), \
-'''\n\n This release of the structToolbox is targeted towards Python 2.7.x,
- we will update to Python 3.x.x in our next iteration. Please change
- your default Python Interpreter accordingly.\n'''
+assert (sys.version_info[:2][0] == 3), \
+'''\n\n The structToolbox is targeted towards Python 3.x.x. Please
+ change your Python Interpreter accordingly.\n'''
  
 # standard library
 import numpy   as np
@@ -20,18 +19,20 @@ dir_ = os.path.dirname(os.path.realpath(__file__)).replace('/scripts', '')
 sys.path.insert(0, dir_)
 
 # project library
-from tools.user.interface           import *
+from tools.auxiliary        import readStep
+from tools.auxiliary        import writeStep
+from tools.user.interface   import *
 
 ''' Main function.
 '''
-def perturb(scale = 0.1, seed = 123, init = 'init.ini', update = False):
+def perturb(scale = 0.1, seed = 123, update = False):
     ''' Perturb current values of structural parameters.
     '''
     ''' Obtain starting values.
     '''
     initObj = initCls()
         
-    initObj.read(init)
+    initObj.read()
         
     initObj.lock()
     
@@ -46,9 +47,9 @@ def perturb(scale = 0.1, seed = 123, init = 'init.ini', update = False):
     if(update):
 
         # Antibugging.
-        assert (os.path.isfile('stepParas.struct.out'))
+        assert (os.path.isfile('stepInfo.struct.out'))
         
-        values = np.array(np.genfromtxt('stepParas.struct.out'), dtype = 'float', ndmin = 1)
+        values = readStep('paras')
         
         # Update parameter objects.
         parasObj.update(values, 'internal', 'all')
@@ -71,25 +72,25 @@ def perturb(scale = 0.1, seed = 123, init = 'init.ini', update = False):
     
     ''' Finishing.
     '''
-    np.savetxt('stepParas.struct.out',  evalPoints, fmt = '%15.10f')
-
+    writeStep(evalPoints, fval = '---', count = 0)
+    
 ''' Auxiliary function.
 '''
 def process(args):
     ''' Process arguments.
     '''
     # Distribute arguments.
-    seed, scale, init, update = args.seed, args.scale, args.init, args.update
+    seed, scale, update = args.seed, args.scale, args.update
     
     # Quality checks.
     assert (update in [True, False])
-    assert (os.path.exists(init))
+    assert (os.path.exists('model.struct.ini'))
     assert (isinstance(seed, int))
     assert (isinstance(scale, float))
     assert (scale >= 0)
     
     # Finishing.
-    return seed, scale, init, update
+    return seed, scale, update
 
 ''' Execution of module as script.
 '''
@@ -110,12 +111,6 @@ if __name__ == '__main__':
                         default = 0.1, \
                         dest    = 'scale', \
                         help    = 'magnitude of perturbation')
-    
-    parser.add_argument('--init', \
-                        action  = 'store', \
-                        dest    = 'init', \
-                        default = 'init.ini', \
-                        help    = 'source for model configuration')
 
     parser.add_argument('--update', \
                         action  = 'store_true', \
@@ -125,6 +120,6 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     
-    seed, scale, init, update = process(args)
+    seed, scale, update = process(args)
     
-    perturb(scale = scale, seed = seed, init = init, update = update)
+    perturb(scale = scale, seed = seed, update = update)

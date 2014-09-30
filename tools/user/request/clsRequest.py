@@ -8,19 +8,24 @@ class requestCls(meta):
     def __init__(self):
         
         self.attr = {}
-
-        self.attr['parasObj']     = None
-                
+        
+        # Constitutive attributes.
+        self.attr['optimization'] = None
+        
         self.attr['obsEconomy']   = None
         
-        self.attr['optimization'] = None
-
-        self.attr['estimation']   = None        
-
+        self.attr['parasObj']     = None
+        
         self.attr['derived']      = None       
 
-        self.attr['init']         = None       
+        self.attr['single']       = None       
 
         # Status indicator.
         self.isLocked = False
+    
+    def _checkIntegrity(self):
+        ''' Check integrity of class instance.
+        '''  
+        # Antibugging.
+        assert (self.getStatus() == True)
         

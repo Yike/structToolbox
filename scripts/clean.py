@@ -5,14 +5,14 @@
 # Check for appropriate Python version.
 import sys
 
-assert (sys.version_info[:2] == (2,7)), \
-'''\n\n This release of the structToolbox is targeted towards Python 2.7.x,
- we will update to Python 3.x.x in our next iteration. Please change
- your default Python Interpreter accordingly.\n'''
+assert (sys.version_info[:2][0] == 3), \
+'''\n\n The structToolbox is targeted towards Python 3.x.x. Please
+ change your Python Interpreter accordingly.\n'''
 
 # standard library.
 import os
 import glob
+import shutil
 import argparse
 
 ''' Main function.
@@ -23,14 +23,12 @@ def clean(resume = False):
     # Potential files.
     fileList  = glob.glob('*.struct.*')
     
-    fileList += glob.glob('.struct.pid')
-   
     # Ensure resume.
     if(resume):
         
         try:      
             
-            fileList.remove('stepParas.struct.out')
+            fileList.remove('stepInfo.struct.out')
         
         except:
             
@@ -48,11 +46,48 @@ def clean(resume = False):
         
     # Remove files.
     for file_ in fileList:
-            
-        os.remove(file_)
-         
+        
+        if('ini' in file_): continue
+        
+        if('simEconomy' in file_): continue
+        
+        remove(file_)
+    
+    # Estimation directory.
+    dirs = glob.glob('.slave-*')
+    
+    for dir_ in dirs:
+        
+        os.chdir(dir_)
+
+        isRunning = os.path.exists('.optimization.struct.out')
+        
+        os.chdir('../')
+
+        if(not isRunning): shutil.rmtree(dir_)
+    
 ''' Auxiliary functions.
 '''
+def remove(name):
+    ''' Remove file or directory (if exists).
+    '''
+    
+    try:
+        
+        os.remove(name)
+        
+    except OSError:
+        
+        pass
+    
+    try:
+        
+        shutil.rmtree(name)
+        
+    except OSError:
+        
+        pass
+        
 def _distributeInput(parser):
     ''' Check input for estimation script.
     '''

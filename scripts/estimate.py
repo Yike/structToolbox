@@ -4,16 +4,16 @@
 # Check for appropriate Python version.
 import sys
 
-assert (sys.version_info[:2] == (2,7)), \
-'''\n\n This release of the structToolbox is targeted towards Python 2.7.x,
- we will update to Python 3.x.x in our next iteration. Please change
- your default Python Interpreter accordingly.\n'''
- 
+assert (sys.version_info[:2][0] == 3), \
+'''\n\n The structToolbox is targeted towards Python 3.x.x. Please
+ change your Python Interpreter accordingly.\n'''
+  
 # standard library
-import cPickle as pkl
-import numpy   as np
+import pickle as pkl
 
 import argparse
+import shutil
+import glob
 import os
 
 # Pythonpath
@@ -21,28 +21,80 @@ dir_ = os.path.dirname(os.path.realpath(__file__)).replace('/scripts', '')
 sys.path.insert(0, dir_)
 
 # project library
+from tools.optimization.interface   import optimize
+from tools.auxiliary                import readStep
 from tools.user.interface           import *
 
-from tools.optimization.interface   import optimize
-
-''' Process initialization file.
+''' Auxiliary functions.
 '''
-def estimate(initFile = 'init.ini', resume = False):
+def cleanup(resume):
+    ''' Remove results from previous estimation run. All other files
+        are immediately overwritten.
+    '''
+
+    if(resume):
+        
+        pass
+        
+    else:
+        
+        dirs = glob.glob('.slave-*')
+
+        for dir_ in dirs:
+            
+            shutil.rmtree(dir_)
+
+def _distributeInput(parser):
+    ''' Check input for estimation script.
+    '''
+    # Parse arguments.
+    args = parser.parse_args()
+
+    # Distribute arguments.
+    resume   = args.resume
+    
+    single   = args.single
+    
+    static   = args.static
+    
+    # Assertions.
+    assert (single in [True, False])
+    
+    assert (resume in [False, True])
+
+    assert (static in [False, True])
+        
+    if(resume): 
+        
+        assert (os.path.exists('stepInfo.struct.out'))
+    
+    else:
+        
+        assert (not os.path.exists('.aggregator.struct.out'))
+    
+    # Finishing.
+    return resume, single, static
+
+''' Main function.
+'''
+def estimate(resume = False, single = False, static = False):
     ''' Run estimation. 
     '''
     # Antibugging.
-    assert (isinstance(initFile, str))
-    assert (os.path.exists(initFile))
-
+    assert (os.path.exists('model.struct.ini'))
     assert (resume in [True, False])
-        
+    assert (static in [True, False])
+    
+    cleanup(resume)
+    
     ''' Process initialization file.
     '''
     initObj = initCls()
     
-    initObj.read(initFile)
+    initObj.read()
     
     initObj.lock()
+    
     
     ''' Distribute information.
     '''
@@ -60,9 +112,11 @@ def estimate(initFile = 'init.ini', resume = False):
 
     file_        = initDict['EST']['file']
     
+    if(static): derived['static'] = True
+    
     ''' Load dataset.
     '''
-    obsEconomy = pkl.load(open(file_ + '.pkl', 'r'))
+    obsEconomy = pkl.load(open(file_, 'rb'))
     
     
     ''' Subset.
@@ -74,27 +128,24 @@ def estimate(initFile = 'init.ini', resume = False):
     
     ''' Update.
     '''
-    if(resume):
+    if(resume): 
         
-        values = np.genfromtxt(open('stepParas.struct.out', 'r'))
-        
-        parasObj.update(values, 'internal', 'all')
+        parasObj.update(readStep('paras'), 'internal', 'all')
+    
     
     ''' Construct request.
     ''' 
     requestObj = requestCls()
 
-    requestObj.setAttr('init', initFile)
-        
-    requestObj.setAttr('parasObj', parasObj)
-    
+    requestObj.setAttr('optimization', optimization)
+
     requestObj.setAttr('obsEconomy', obsEconomy)
     
-    requestObj.setAttr('estimation', estimation)
-
+    requestObj.setAttr('parasObj', parasObj)
+    
     requestObj.setAttr('derived', derived)
     
-    requestObj.setAttr('optimization', optimization)
+    requestObj.setAttr('single', single)
 
     requestObj.lock()
     
@@ -102,55 +153,6 @@ def estimate(initFile = 'init.ini', resume = False):
     '''
     optimize(requestObj)
 
-''' Auxiliary functions.
-'''
-def cleanup():
-    ''' Remove results from previous estimation run. All other files
-        are immediately overwritten.
-    '''
-
-    try:
-        
-        os.remove('rslt.struct.pkl')
-        
-    except OSError:
-        
-        pass
-    
-def _distributeInput(parser):
-    ''' Check input for estimation script.
-    '''
-    # Parse arguments.
-    args = parser.parse_args()
-
-    # Distribute arguments.
-    initFile = args.init 
-    
-    resume   = args.resume
-    
-    # Assertions.
-    assert (initFile is not None)
-    assert (os.path.exists(initFile))
-    
-    assert (resume in [False, True])
-    
-    if(resume): assert (os.path.exists('stepParas.struct.out'))
-    
-    # Finishing.
-    return initFile, resume
-
-def fork():
-    ''' Fork child process to run estimation in the background.
-    '''
-        
-    pid = os.fork()
-
-    if(pid > 0): sys.exit(0)
-
-    pid = os.getpid()
-    
-    np.savetxt('.struct.pid', [pid], fmt ='%d')
-    
 ''' Execution of module as script.
 '''
 if __name__ == '__main__':
@@ -159,22 +161,24 @@ if __name__ == '__main__':
         'Start of estimation run of the structToolbox.', 
         formatter_class = argparse.ArgumentDefaultsHelpFormatter)
     
-    parser.add_argument('--init', \
-                        action  = 'store', \
-                        dest    = 'init', \
-                        default = 'init.ini', \
-                        help    = 'specify initialization file')
-    
     parser.add_argument('--resume', \
                         action  = 'store_true', \
                         dest    = 'resume', \
                         default = False, \
                         help    = 'resume estimation run')
     
-    cleanup()
+    parser.add_argument('--single', \
+                        action  = 'store_true', \
+                        dest    = 'single', \
+                        default = False, \
+                        help    = 'single evaluation')
+
+    parser.add_argument('--static', \
+                        action  = 'store_true', \
+                        dest    = 'static', \
+                        default = False, \
+                        help    = 'static model')
     
-    fork() 
-     
-    initFile, resume = _distributeInput(parser)
-        
-    estimate(initFile = initFile, resume = resume)
+    resume, single, static = _distributeInput(parser)  
+    
+    estimate(resume = resume, single = single, static = static)

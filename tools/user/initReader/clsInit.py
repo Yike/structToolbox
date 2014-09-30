@@ -2,13 +2,14 @@
 '''
 
 # standard library
+import shutil
 import shlex
 
 # project library
 from tools.clsMeta import meta
 
 # relative import
-import _interface  as aux
+import tools.user.initReader._interface  as aux
 
 ''' Initialization file class.
 '''
@@ -24,14 +25,21 @@ class initCls(meta):
     
     ''' Public Methods.
     '''
-    def read(self, configFile='init.ini'):
+    def read(self):
         ''' Read initialization file.
         '''
         # Initialize dictionary.        
         initDict = self._initializeDictionary()
-           
+        
+        # Ensure order.
+        hasUtility = False
+        
+        hasEnviro  = False
+        
+        hasWage    = False
+                
         # Algorithm.
-        with open(configFile, 'r') as initFile:
+        with open('model.struct.ini', 'r') as initFile:
         
             for line in initFile:
             
@@ -57,22 +65,34 @@ class initCls(meta):
                         
                     initDict = self._processOBSERVED(initDict, currentLine)
         
-                if(keyword == 'BASICS'):
+                if(keyword == 'ENVIRONMENT'):
                         
-                    initDict = self._processBASICS(initDict, currentLine)        
-        
-                if(keyword == 'SHOCKS'):
-
-                    initDict = self._processSHOCKS(initDict, currentLine)        
-
+                    initDict  = self._processENVIRO(initDict, currentLine)        
+                    
+                    hasEnviro = True
+                
                 if(keyword == 'UTILITY'):
-                        
-                    initDict = self._processUTILITY(initDict, currentLine)  
+                    
+                    assert (hasEnviro == True)
+                    
+                    initDict   = self._processUTILITY(initDict, currentLine)  
+
+                    hasUtility = True
 
                 if(keyword == 'WAGE'):
-                        
+
+                    assert (hasUtility == True)
+                                    
                     initDict = self._processWAGE(initDict, currentLine)  
                     
+                    hasWage  = True
+
+                if(keyword == 'SHOCKS'):
+                    
+                    assert (hasWage == True)
+                    
+                    initDict = self._processSHOCKS(initDict, currentLine)        
+
                 if(keyword == 'OPTIMIZATION'):
                         
                     initDict = self._processOPT(initDict, currentLine)        
@@ -97,13 +117,15 @@ class initCls(meta):
         initDict['PARAS'] = parasObj
 
         initDict['TREE'] = treeObj
- 
-        # Checks.
-        aux._checks(initDict)
- 
+  
         # Finishing.                                                        
         self.attr['initDict'] = initDict
 
+        # Checks and standardization.
+        aux._checks(initDict)
+        
+        self._standardize()
+        
     ''' Private methods.
     '''
     def _intercepts(self, initDict):
@@ -138,11 +160,11 @@ class initCls(meta):
         
         pos = pos + initDict['WAGE']['exper']['pos']
 
-        pos = pos + initDict['OBSERVED']['wage']
+        pos = pos + [initDict['OBSERVED']['wage']]
         
-        pos = pos + initDict['OBSERVED']['choice']
+        pos = pos + [initDict['OBSERVED']['choice']]
         
-        pos = pos + initDict['OBSERVED']['spouse']
+        pos = pos + [initDict['OBSERVED']['spouse']]
         
         pos = list(set(pos))
         
@@ -151,7 +173,7 @@ class initCls(meta):
         
         initDict['DERIV']['numAttr'] = len(pos)
         
-        initDict['DERIV']['static'] = (initDict['BASICS']['discount'] == 0.0)
+        initDict['DERIV']['static'] = (initDict['ENVIRO']['discount'] == 0.0)
         
         # Finishing.
         return initDict
@@ -165,14 +187,14 @@ class initCls(meta):
         
         # Process information.    
         keyword = currentLine[0]
-
+        
         # Construct dictionary.   
         if(keyword in ['coeff']):
             
             pos = int(currentLine[1])
             
             value, isFree = aux._processLine(currentLine[2])
-            
+        
             initDict['WAGE']['coeffs']['pos'] += [pos] 
  
             initDict['WAGE']['coeffs']['value'] += [value] 
@@ -243,7 +265,8 @@ class initCls(meta):
  
             initDict['UTILITY']['child']['value'] += [value] 
 
-            initDict['UTILITY']['child']['free'] += [isFree]             
+            initDict['UTILITY']['child']['free'] += [isFree] 
+                        
         # Finishing.
         return initDict
     
@@ -258,23 +281,13 @@ class initCls(meta):
         keyword = currentLine[0]
             
         # Construct dictionary.   
-        if(keyword == 'sd'):
-            
-            value, isFree = aux._processLine(currentLine[2])
-            
-            subtype = currentLine[1]
-            
-            initDict['SHOCKS'][subtype]['value'] = value
-
-            initDict['SHOCKS'][subtype]['free'] = isFree
-        
-        if(keyword == 'rho'):
+        if(keyword in ['rho', 'eps', 'eta']):
             
             value, isFree = aux._processLine(currentLine[1])
             
-            initDict['SHOCKS']['rho']['value'] = value
+            initDict['SHOCKS'][keyword]['value'] = value
         
-            initDict['SHOCKS']['rho']['free'] = isFree
+            initDict['SHOCKS'][keyword]['free'] = isFree
         
         # Finishing.
         return initDict
@@ -295,7 +308,7 @@ class initCls(meta):
         flag = int(flag)
             
         # Construct dictionary.        
-        initDict['OBSERVED'][keyword] = [flag]
+        initDict['OBSERVED'][keyword] = flag
         
         # Finishing.
         return initDict
@@ -313,13 +326,7 @@ class initCls(meta):
         flag = currentLine[1]
         
         # Type conversion.
-        if(keyword in ['file']):
-            
-            flag = str(flag)
-        
-        else:
-            
-            flag = int(flag)
+        flag = int(flag)
 
         # Construct dictionary.        
         initDict['SIM'][keyword] = flag
@@ -373,45 +380,17 @@ class initCls(meta):
         
         # Process information.    
         keyword = currentLine[0]
-        flag = currentLine[1]
-        
-        if(keyword == 'optimizer'):
-                            
-            toolbox = currentLine[1].split('-')[0]
-                        
-            algorithm = currentLine[1].split('-')[1]
-                        
-            initDict['OPT']['algorithm'] = algorithm
-                            
-            initDict['OPT']['toolbox'] = toolbox
-            
-            initDict['OPT']['optimizer'] = flag
-            
-            return initDict
-        
-        # Special treatment.
-        if(keyword == 'maxiter'):
-                            
-            if(flag.upper() == 'NONE'):
-                                
-                flag = None
-                                
-            else:
-                                
-                flag = int(flag)
-                        
-        if(keyword in ['reps', 'cpus']):
-        
-            flag = int(flag)        
-        
+
+        flag    = currentLine[1]
+
         # Construct dictionary.        
         initDict['OPT'][keyword] = flag
         
         # Finishing.
         return initDict
 
-    def _processBASICS(self, initDict, currentLine):
-        ''' Process optimization details.
+    def _processENVIRO(self, initDict, currentLine):
+        ''' Process environment details.
         '''
         # Antibugging.
         assert (isinstance(initDict, dict))
@@ -427,7 +406,7 @@ class initCls(meta):
             flag = float(flag)
 
         # Construct dictionary.        
-        initDict['BASICS'][keyword] = flag
+        initDict['ENVIRO'][keyword] = flag
         
         # Finishing.
         return initDict
@@ -443,7 +422,7 @@ class initCls(meta):
 
         initDict['UTILITY'] = {}
         
-        initDict['BASICS'] = {}
+        initDict['ENVIRO'] = {}
 
         initDict['SHOCKS'] = {}
 
@@ -518,4 +497,137 @@ class initCls(meta):
         
         # Finishing.
         return initDict
+    
+    def _standardize(self):
+        ''' Standardize initialization file.
+        '''
+        # Distribute class attributes.
+        initDict = self.attr['initDict']
+        
+        str_ = '\t {0:<8}{1:<8}\t{2:<8}\n'
+        
+        with open('.model.struct.ini', 'wt') as fout:
+    
+            # Observed, Environment.
+            for key_ in ['OBSERVED', 'ENVIRO']:
+
+                if(key_ == 'OBSERVED'): label = 'OBSERVED'
+                
+                if(key_ == 'ENVIRO'):   label = 'ENVIRONMENT'
+                
+                fout.write('\n ' + label + '\n\n')
+                
+                for name in initDict[key_].keys():
+                    
+                    pos = initDict[key_][name]
+                    
+                    fout.write(str_.format(name, '', pos))
+            
+            # Utility.
+            fout.write('\n UTILITY \n\n')
+            
+            pos    = initDict['UTILITY']['child']['pos'][0]
+            
+            isFree = initDict['UTILITY']['child']['free'][0]
+                        
+            info   = initDict['UTILITY']['child']['value'][0]
+            
+            if(not isFree): info = '!' + str(info)
+                        
+            fout.write(str_.format('child', pos, info))
+            
+            fout.write('\n')
+            
+            for subtype in ['coeffs', 'int']:
+        
+                values = initDict['UTILITY'][subtype]['value']
+                
+                isFree = initDict['UTILITY'][subtype]['free'] 
+                                
+                for count, info in enumerate(values):
+                    
+                    pos = ''
+                    
+                    if(subtype == 'coeffs'): 
+                        
+                        pos = initDict['UTILITY'][subtype]['pos'][count]
+                    
+                    if(not isFree[count]): info = '!' + str(info)                   
+                    
+                    label = subtype.replace('s', '')
+                    
+                    fout.write(str_.format(label, pos, info))
+            
+                fout.write('\n')
+                            
+            # Utility.
+            fout.write('\n WAGE \n\n')
+            
+            pos    = initDict['WAGE']['exper']['pos'][0]
+            
+            isFree = initDict['WAGE']['exper']['free'][0]
+                        
+            info   = initDict['WAGE']['exper']['value'][0]
+            
+            if(not isFree): info = '!' + str(info)
+                        
+            fout.write(str_.format('exper', pos, info))
+            
+            fout.write('\n')
+                        
+            for subtype in ['coeffs', 'int']:
+        
+                values = initDict['WAGE'][subtype]['value']
+                
+                isFree = initDict['WAGE'][subtype]['free'] 
+                                
+                for count, info in enumerate(values):
+                    
+                    pos = ''
+                    
+                    if(subtype == 'coeffs'): 
+                        
+                        pos = initDict['WAGE'][subtype]['pos'][count]
+                    
+                    if(not isFree[count]): info = '!' + str(info)                   
+                    
+                    label = subtype.replace('s', '')
+                    
+                    fout.write(str_.format(label, pos, info))
+                
+                fout.write('\n')
+                            
+            # Shocks 
+            fout.write('\n SHOCKS \n\n')
+            
+            for name in ['eps', 'eta', 'rho']:
+                
+                info   = initDict['SHOCKS'][name]['value']
+                
+                isFree = initDict['SHOCKS'][name]['free']
+                
+                if(not isFree): info = '!' + str(info)
+                
+                fout.write(str_.format(name, '', info))
+                                                
+            # Estimation, Simulation, Optimization.
+            str_ = '\t {0:<15}\t{1:<8}\n'
+                    
+            for key_ in ['EST', 'SIM', 'OPT']:
+                
+                if(key_ == 'EST'): label = 'ESTIMATION'
+                
+                if(key_ == 'SIM'): label = 'SIMULATION'
+                
+                if(key_ == 'OPT'): label = 'OPTIMIZATION'
+                
+                fout.write('\n ' + label + ' \n\n')
+                
+                for name in initDict[key_].keys():
+                    
+                    info = str(initDict[key_][name])
+
+                    fout.write(str_.format(name, info))
+                    
+        shutil.move('.model.struct.ini', 'model.struct.ini') 
         

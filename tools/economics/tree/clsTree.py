@@ -7,7 +7,7 @@ import collections
 # project library
 from tools.clsMeta import meta
 
-from clsNode      import nodeCls
+from tools.economics.tree.clsNode      import nodeCls
 
 
 class treeCls(meta):
@@ -178,7 +178,7 @@ class treeCls(meta):
            
         listAllNodes = getAllNodesRecursive(self.attr['rootNode'],listAllNodes)
        
-        return  sorted(listAllNodes)
+        return  listAllNodes
     
     def getTerminalNodes(self):
 

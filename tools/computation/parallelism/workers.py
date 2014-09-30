@@ -1,7 +1,7 @@
 ''' Script for parallel execution.
 '''
 # standard library
-import  cPickle as      pkl
+import  pickle as      pkl
 import  numpy   as      np
 
 from   mpi4py  import  MPI
