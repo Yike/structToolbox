@@ -78,7 +78,7 @@ def build(bld):
     
 def distclean(ctx):
     
-    remove_filetypes_distclean('.')
+    #remove_filetypes_distclean('.')
 
     remove_for_distclean('.waf3-1.6.4-8c7ad4bb8e1ca65b04e5d8dd9d0dac54')
 
@@ -143,7 +143,7 @@ def remove_filetypes_distclean(path):
 
         for filetypes in ['*.aux','*.log','*.pyc', '*.so', '*~', '*tar', \
             '*.zip', '.waf*', '*lock*', '*.mod', '*.a', '*.pkl', '*.out', '*.pyo', '*.info',\
-            '*.struct.*', '__pycache__']:
+            '__pycache__']:
 
                 for filename in fnmatch.filter(filenames, filetypes):
                     
