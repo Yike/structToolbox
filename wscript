@@ -78,6 +78,7 @@ def build(bld):
     
 def distclean(ctx):
     
+    print(os.getcwd())
     #remove_filetypes_distclean('.')
 
     remove_for_distclean('.waf3-1.6.4-8c7ad4bb8e1ca65b04e5d8dd9d0dac54')
