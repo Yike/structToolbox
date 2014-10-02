@@ -118,8 +118,8 @@ def set_permissions():
 
     for file_ in files:
         
-        os.chmod(file_, 777)
-    
+        os.chmod(file_, 0o755)
+
 def remove_for_distclean(path):
     ''' Remove path, where path can be either a directory or a file. The
         appropriate function is selected. Note, however, that if an 
