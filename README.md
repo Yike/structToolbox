@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/peisenha/structToolbox.svg?branch=master)](https://travis-ci.org/peisenha/structToolbox)
-
 structToolbox
 ============= 
 
@@ -16,6 +14,8 @@ Contact:
 info@policy-lab.org
 
 You can sign up for our mailing list [here](http://eepurl.com/RStEH).
+
+[![Build Status](https://travis-ci.org/peisenha/structToolbox.svg?branch=master)](https://travis-ci.org/peisenha/structToolbox)
 
 ====
 
