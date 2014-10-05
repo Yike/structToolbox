@@ -1,5 +1,4 @@
-.. image:: https://travis-ci.org/peisenha/structToolbox.svg?branch=master
-    :target: https://travis-ci.org/peisenha/structToolbox
+[![Build Status](https://travis-ci.org/peisenha/structToolbox.svg?branch=master)](https://travis-ci.org/peisenha/structToolbox)
 
 structToolbox
 ============= 
