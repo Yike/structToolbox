@@ -8,7 +8,7 @@ import os
 
 
 
-packages = ['libblas-dev', 'liblapack-dev', 'gfortran', 'python3-dev', 'python3-numpy', 'python3-scipy']
+packages = ['libblas-dev', 'liblapack-dev', 'gfortran']
 
 
 for package in packages:
