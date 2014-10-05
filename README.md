@@ -17,7 +17,6 @@ You can sign up for our mailing list [here](http://eepurl.com/RStEH).
 
 <br>
 [![Build Status](https://travis-ci.org/peisenha/structToolbox.svg?branch=master)](https://travis-ci.org/peisenha/structToolbox)
-
 ====
 
 The **structToolbox** was originally developed for a guest lecture on the estimation of structural behavioral models in the course *Life Cycle Dynamics, Inequality and Mobility* by Prof. James Heckman at the University of Chicago Department of Economics. 
