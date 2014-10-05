@@ -12,6 +12,6 @@ packages = ['gfortran', 'python3-dev', 'python3-numpy', 'python3-scipy', 'python
 				'python3-setuptools', 'python3-pip', 'python3-nose', 'git']
 
 
-for package in packages:
+#for package in packages:
 
-    os.system('sudo apt-get install -y ' + package)
+#    os.system('sudo apt-get install -y ' + package)
