@@ -1,15 +1,12 @@
 #!/usr/bin/env python
-''' This script provisions the required software environment to run
-	the structToolbox.
+''' Script that prepare the virtual machine for the installation of SciPy and Pandas.
 '''
 
 # standard library
 import os
 
-
-
+# Installation.
 packages = ['libblas-dev', 'liblapack-dev', 'gfortran']
-
 
 for package in packages:
 

@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/peisenha/structToolbox.svg?branch=master
+    :target: https://travis-ci.org/peisenha/structToolbox
+
 structToolbox
 ============= 
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-''' This script provisions the required software environment to run
-	the structToolbox.
+''' Script that executes the testings for the Travis CI integration server.
 '''
 
+# standard library
 import os
 
-#
-os.system('./waf configure build --test')
+# Tests.
+#os.system('./waf configure build --test')
 
-os.system('./waf configure build --test --speed')
+#os.system('./waf configure build --test --speed')
