@@ -7,8 +7,13 @@ import numpy    as np
 np.seterr('ignore')
 
 import shutil
+import glob
 import sys
 import os
+
+# module variables
+FILE_PATH = os.path.dirname(os.path.realpath(__file__))
+TEST_PATH = os.getcwd()
 
 # testing library
 from nose.core  import runmodule
@@ -19,16 +24,46 @@ dir_ = os.path.dirname(os.path.realpath(__file__)).replace('/tests', '')
 sys.path.insert(0, dir_)
 
 # project library
-from tools.user.interface           import *
-from tools.optimization.interface   import optimize
-from scripts.simulate               import simulate
+from tools.user.interface import *
 
 # Set working directory.
 dir_ = os.path.abspath(os.path.split(sys.argv[0])[0])
 os.chdir(dir_)
 
+''' Auxiliary functions.
+'''
+def cleanup():
+
+    files = []
+
+    files = files + ['model.struct.ini']
+
+    files = files + ['optimizers.struct.ini']
+
+    for file_ in files:
+
+        try:
+
+            os.remove(file_)
+
+        except OSError:
+
+            pass
+
+''' Test class.
+'''
 class testCls(object):
-    
+
+    def setup(self):
+
+        os.chdir(FILE_PATH)
+
+    def teardown(self):
+
+        cleanup()
+
+        os.chdir(TEST_PATH)
+
     def test_case_1(self):
 
         shutil.copy('../dat/testB.ini', 'model.struct.ini')
@@ -63,11 +98,7 @@ class testCls(object):
             int_  = parasObj._transformToInternal(paraObj, ext)
             
             assert_almost_equal(value, int_)
-                
-        os.remove('model.struct.ini')
 
-        os.remove('optimizers.struct.ini')
-            
             
 ''' Execution of module as script.
 '''

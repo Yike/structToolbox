@@ -12,12 +12,16 @@ import shutil
 import sys
 import os
 
+# module variables
+FILE_PATH = os.path.dirname(os.path.realpath(__file__))
+TEST_PATH = os.getcwd()
+
 # testing library
 from nose.core  import runmodule
 from nose.tools import *
- 
+
 # Pythonpath
-dir_ = os.path.dirname(os.path.realpath(__file__)).replace('/tests', '')
+dir_ = FILE_PATH.replace('/tests', '')
 sys.path.insert(0, dir_)
 
 # project library
@@ -31,10 +35,44 @@ from scripts.simulate               import simulate
 dir_ = os.path.abspath(os.path.split(sys.argv[0])[0])
 os.chdir(dir_)
 
+''' Auxiliary functions.
+'''
+def cleanup():
+
+    files = []
+
+    files = files + ['simEconomy.struct.pkl']
+
+    files = files + ['model.struct.ini']
+
+    files = files + ['optimizers.struct.ini']
+
+    for file_ in files:
+
+        try:
+
+            os.remove(file_)
+
+        except OSError:
+
+            pass
+
+''' Test class.
+'''
 class testCls(object):
-    
+
+    def setup(self):
+
+        os.chdir(FILE_PATH)
+
+    def teardown(self):
+
+        cleanup()
+
+        os.chdir(TEST_PATH)
+
     def test_case_1(self):
-        
+
         shutil.copy('../dat/testB.ini', 'model.struct.ini')
 
         shutil.copy('../dat/optimizers.ini', 'optimizers.struct.ini')
@@ -95,11 +133,7 @@ class testCls(object):
             if(fval is None): fval = rslt 
             
             assert_true(np.allclose(fval, -165.628510699) == True)
-            
-        os.remove('model.struct.ini')
 
-        os.remove('optimizers.struct.ini')
-            
 ''' Execution of module as script.
 '''
 if __name__ == '__main__':
