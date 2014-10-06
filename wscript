@@ -143,7 +143,7 @@ def remove_filetypes_distclean(path):
 
         for filetypes in ['*.aux','*.log','*.pyc', '*.so', '*~', '*tar', \
             '*.zip', '.waf*', '*lock*', '*.mod', '*.a', '*.pkl', '*.out', '*.pyo', '*.info',\
-            '__pycache__']:
+            '__pycache__', '.coverage']:
 
                 for filename in fnmatch.filter(filenames, filetypes):
                     
