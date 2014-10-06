@@ -6,6 +6,8 @@
 import os
 
 # Tests.
-#os.system('./waf configure build --test')
+os.system('./waf configure build --test')
 
-#os.system('./waf configure build --test --speed')
+os.system('./waf configure build --test --speed')
+
+os.system('nosetests --with-coverage --exe')
