@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 ''' Simulation script.
 '''
-# Check for appropriate Python version.
+# Check for appropriate Python version..
 import sys
 
 assert (sys.version_info[:2][0] == 3), \
